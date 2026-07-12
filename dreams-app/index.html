@@ -1,0 +1,45 @@
+<div id="dreams-app">
+  <!-- ФИЛЬТРЫ -->
+  <div class="dreams-controls">
+    <div class="dreams-filter">
+      <span class="dreams-filter__label">Локация</span>
+      <div class="tab-divider"></div>
+      <div class="dreams-filter__tabs" id="filter-tabs">
+        <!-- табы вставятся динамически -->
+      </div>
+    </div>
+
+    <div class="dreams-sort">
+      <span class="dreams-sort__label">Сортировка</span>
+      <div class="dreams-sort__tabs" id="sort-tabs">
+        <button class="dreams-sort__tab dreams-sort__tab--active" data-sort="year-desc">Новые</button>
+        <button class="dreams-sort__tab" data-sort="year-asc">Старые</button>
+        <button class="dreams-sort__tab" data-sort="location-asc">А-Я</button>
+        <button class="dreams-sort__tab" data-sort="location-desc">Я-А</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- СЧЁТЧИК -->
+  <div class="dreams-count">Найдено снов: <span id="dreams-count-value">0</span></div>
+
+  <!-- СЕТКА КАРТОЧЕК -->
+  <div class="dreams-grid" id="dreams-grid"></div>
+
+  <!-- КНОПКА ЭМБИЕНТА -->
+  <button id="ambient-toggle" class="ambient-btn" title="Фоновый звук">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+      <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+      <path d="M9 17v-13h10v13" />
+      <path d="M9 8h10" />
+    </svg>
+  </button>
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
+
+
+<link rel="stylesheet" href="./style.css">
+<script src="./script.js"></script>

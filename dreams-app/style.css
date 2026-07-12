@@ -1,0 +1,293 @@
+:root {
+  --color-text: #ffffff;
+  --black-color: #121212;
+  --superblack-color: #000000;
+  --dark-grey-color: #1a1a1a;
+  --color-grey: #999999;
+  --color-lightgrey: #cacaca;
+  --color-lightest-grey: #fafafa;
+  --stroke-middle: #555555;
+  --stroke-dark: #333333;
+  --shadow-color: #080808;
+  --footer-color: #000000;
+  --color-accent: #ccc1ea;
+
+  --font: 'Manrope', sans-serif;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --fontSize-0: 0.75rem;
+  --fontSize-1: 0.875rem;
+  --fontSize-2: 1rem;
+  --fontSize-3: 1.25rem;
+  --radii-1: 6px;
+}
+
+body {
+  background-color: var(--black-color);
+}
+
+#dreams-app {
+  font-family: var(--font);
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-5);
+  box-sizing: border-box;
+  position: relative;
+  color: var(--color-text);
+}
+
+/* --- Общий контейнер фильтров и сортировки --- */
+.dreams-controls {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  align-items: start;
+  gap: var(--space-5);
+  margin-bottom: var(--space-6);
+}
+
+/* --- Фильтр --- */
+.dreams-filter {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tab-divider {
+  background-color: var(--dark-grey-color);
+  height: 1px;
+  width: 100%;
+}
+
+.dreams-filter__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fontSize-0);
+  color: var(--color-lightest-grey);
+}
+
+.dreams-filter__label .icon {
+  width: 1em;
+  height: 1em;
+}
+
+.dreams-filter__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  position: relative;
+}
+
+/* --- Сортировка --- */
+.dreams-sort {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.dreams-sort__label {
+  font-size: var(--fontSize-0);
+  color: var(--color-lightest-grey);
+  white-space: nowrap;
+}
+
+.dreams-sort__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+}
+
+/* --- Общие стили табов (фильтр и сортировка) --- */
+.dreams-filter__tab,
+.dreams-sort__tab {
+  border: none;
+  border-radius: calc(var(--space-1) / 2);
+  background-color: var(--dark-grey-color);
+  color: var(--color-lightest-grey);
+  padding: var(--space-1) var(--space-3);
+  font-family: inherit;
+  font-size: var(--fontSize-0);
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1.4;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.dreams-filter__tab:hover,
+.dreams-sort__tab:hover {
+  background-color: var(--stroke-dark);
+  color: var(--color-grey);
+}
+
+.dreams-filter__tab--active,
+.dreams-sort__tab--active {
+  background-color: var(--superblack-color);
+  color: var(--color-lightgrey);
+  font-weight: 600;
+}
+
+.dreams-filter__tab--active:hover,
+.dreams-sort__tab--active:hover {
+  color: var(--color-lightest-grey);
+}
+
+/* --- Счётчик --- */
+.dreams-count {
+  margin-bottom: var(--space-4);
+  font-size: var(--fontSize-0);
+  color: var(--stroke-middle);
+}
+
+/* --- Сетка карточек --- */
+.dreams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-5);
+}
+
+.dream-card {
+  position: relative;
+  background: var(--black-color);
+  border: 1px solid var(--stroke-middle);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border 0.15s;
+}
+
+.dream-card:hover {
+  border: 1px solid var(--color-lightgrey);
+}
+
+.dream-card--read {
+  opacity: 0.35;
+  background: var(--stroke-middle);
+}
+
+.dream-card--read::after {
+  content: "✓";
+  position: absolute;
+  top: var(--space-3);
+  right: var(--space-3);
+  font-size: var(--fontSize-1);
+  color: var(--color-text);
+}
+
+.dream-card__title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--fontSize-3);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.dream-card__meta {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fontSize-1);
+  color: var(--color-lightgrey);
+}
+
+.dream-card__desc {
+  margin: 0 0 var(--space-4);
+  font-size: var(--fontSize-2);
+  line-height: 1.5;
+  color: var(--color-lightgrey);
+}
+
+.dream-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: auto;
+}
+
+/* --- Унифицированные кнопки READ и LISTEN/PAUSE --- */
+.dream-card__link,
+.dream-card__audio-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  font-family: inherit;
+  font-size: var(--fontSize-1);
+  font-weight: 600;
+  color: var(--color-lightgrey);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s, color 0.15s;
+}
+
+.dream-card__link:hover,
+.dream-card__audio-btn:hover {
+  color: var(--color-accent);
+}
+
+.dream-card__audio-btn .icon,
+.dream-card__link .icon {
+  width: 1em;
+  height: 1em;
+}
+
+/* --- Кнопка эмбиента --- */
+.ambient-btn {
+  position: fixed;
+  bottom: var(--space-5);
+  right: var(--space-5);
+  z-index: 999;
+  padding: var(--space-2);
+  border-radius: 50%;
+  border: 1px solid var(--stroke-dark);
+  background: var(--black-color);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  color: var(--color-text);
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ambient-btn:hover {
+  color: var(--shadow-color);
+  background-color: var(--stroke-dark);
+}
+
+.ambient-btn--on {
+  background: var(--shadow-color);
+  color: var(--color-lightest-grey);
+  border-color: var(--shadow-color);
+}
+
+.ambient-btn .icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+
+/* --- Мобильная адаптация --- */
+@media (max-width: 640px) {
+  .dreams-controls {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .dreams-sort {
+    align-self: flex-start;
+  }
+
+  .dreams-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ambient-btn {
+    bottom: var(--space-4);
+    right: var(--space-4);
+  }
+}
