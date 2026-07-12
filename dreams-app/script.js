@@ -3,12 +3,12 @@
 
 
     const dreams = [
-        { id: 1, year: 2025, location: 'Париж', popupId: '1', title: 'Первый сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/voice1.mp3' },
+        { id: 1, year: 2025, location: 'Париж', popupId: '1', title: 'Первый сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/audio_1.mp3' },
         { id: 2, year: 2024, location: 'Токио', popupId: '2', title: 'Второй сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 3, year: 2025, location: 'Париж', popupId: '3', title: 'Третий сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/voice2.mp3' },
+        { id: 3, year: 2025, location: 'Париж', popupId: '3', title: 'Третий сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/audio_2.wav' },
         { id: 4, year: 2023, location: 'Нью-Йорк', popupId: '4', title: 'Четвёртый сон', description: 'Краткое описание...', audioUrl: null },
         { id: 5, year: 2024, location: 'Токио', popupId: '5', title: 'Пятый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 6, year: 2025, location: 'Лондон', popupId: '6', title: 'Шестой сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/voice1.mp3' }
+        { id: 6, year: 2025, location: 'Лондон', popupId: '6', title: 'Шестой сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/audio_4.m4a' }
     ];
 
 
@@ -142,7 +142,7 @@
     const ambientBtn = document.getElementById('ambient-toggle');
 
     const ambient = new Howl({
-        src: ['https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/860698__ekoscaotikos__gentle-talking.wav'],
+        src: ['https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/ambient.wav'],
         loop: true,
         volume: 0,
         preload: true
