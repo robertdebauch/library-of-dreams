@@ -291,3 +291,43 @@ body {
     right: var(--space-4);
   }
 }
+
+/* стили плеера */
+
+.dreams-player {
+  position: fixed;
+  bottom: var(--space-4);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  background: var(--dark-grey-color);
+  border: 1px solid var(--stroke-dark);
+  border-radius: var(--radii-1);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.player-toggle {
+  background: none;
+  border: none;
+  color: var(--color-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+.player-toggle .icon {
+  width: 1.2em;
+  height: 1.2em;
+}
+.player-info {
+  font-size: var(--fontSize-1);
+  color: var(--color-lightgrey);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}

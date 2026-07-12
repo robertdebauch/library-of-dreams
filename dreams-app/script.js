@@ -178,6 +178,86 @@
         });
     }
 
+
+
+    // =====================
+    // 10. ПЛЕЕР (с корректными обработчиками и защитой от тройного клика)
+    // =====================
+    let playerBar, playerToggle, playerInfo;
+
+    function createPlayer() {
+        const app = document.getElementById('dreams-app');
+        if (!app) return;
+
+        const player = document.createElement('div');
+        player.id = 'dreams-player';
+        player.className = 'dreams-player';
+        player.style.display = 'none';
+
+        const toggleBtn = document.createElement('button');
+        toggleBtn.id = 'player-toggle';
+        toggleBtn.className = 'player-toggle';
+        toggleBtn.innerHTML = `
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M7 4v16l13 -8z" />
+    </svg>`;
+
+        const infoSpan = document.createElement('span');
+        infoSpan.id = 'player-info';
+        infoSpan.className = 'player-info';
+
+        player.appendChild(toggleBtn);
+        player.appendChild(infoSpan);
+        app.appendChild(player);
+
+        playerBar = player;
+        playerToggle = toggleBtn;
+        playerInfo = infoSpan;
+
+        // Обработчик клика прямо здесь, когда кнопка уже существует
+        playerToggle.addEventListener('click', (e) => {
+            e.stopPropagation();               // не даём всплыть до #dreams-app
+            if (!voiceHowl) return;
+            if (voicePlaying) {
+                voiceHowl.pause();
+            } else {
+                voiceHowl.play();
+            }
+            // updatePlayer вызовется через syncAudioButtons -> updatePlayer
+        });
+    }
+
+    function updatePlayer() {
+        if (!playerBar) return;
+        if (voiceHowl) {
+            playerBar.style.display = 'flex';
+            const dream = dreams.find(d => d.id === voiceDreamId);
+            playerInfo.textContent = dream ? `${dream.title} (${dream.year} · ${dream.location})` : 'Сейчас играет';
+
+            playerToggle.innerHTML = voicePlaying ?
+                `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+         <path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
+         <path d="M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
+       </svg>` :
+                `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+         <path d="M7 4v16l13 -8z" />
+       </svg>`;
+        } else {
+            playerBar.style.display = 'none';
+        }
+    }
+
+    // Подключаем обновление плеера к syncAudioButtons
+    const originalSync = syncAudioButtons;
+    syncAudioButtons = function () {
+        originalSync();
+        updatePlayer();
+    };
+
+
+
+
+
     grid.addEventListener('click', (e) => {
         const btn = e.target.closest('.dream-card__audio-btn');
         if (!btn) return;
@@ -225,7 +305,9 @@
         voiceHowl.play();
     });
 
-    ambientBtn.addEventListener('click', () => {
+    ambientBtn.addEventListener('click', (event) => {
+        event.stopPropagation();
+
         if (!ambientOn) {
             ambient.volume(1.0);
             ambient.play();
@@ -279,4 +361,7 @@
 
     buildFilterTabs();
     applyFiltersAndSort();
+    createPlayer();
+    updatePlayer();
+
 })();
