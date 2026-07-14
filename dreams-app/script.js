@@ -8,7 +8,26 @@
         { id: 3, year: 2025, location: 'Париж', popupId: '3', title: 'Третий сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/audio_2.wav' },
         { id: 4, year: 2023, location: 'Нью-Йорк', popupId: '4', title: 'Четвёртый сон', description: 'Краткое описание...', audioUrl: null },
         { id: 5, year: 2024, location: 'Токио', popupId: '5', title: 'Пятый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 6, year: 2025, location: 'Лондон', popupId: '6', title: 'Шестой сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/audio_4.m4a' }
+        { id: 6, year: 2025, location: 'Лондон', popupId: '6', title: 'Шестой сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 7, year: 2025, location: 'Париж', popupId: '7', title: 'Седьмой сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 8, year: 2024, location: 'Токио', popupId: '8', title: 'Восьмой сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 9, year: 2025, location: 'Париж', popupId: '9', title: 'Девятый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 10, year: 2023, location: 'Нью-Йорк', popupId: '10', title: 'Десятый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 11, year: 2024, location: 'Токио', popupId: '11', title: 'Одиннадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 12, year: 2025, location: 'Лондон', popupId: '12', title: 'Двенадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 13, year: 2024, location: 'Токио', popupId: '13', title: 'Тринадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 14, year: 2025, location: 'Лондон', popupId: '14', title: 'Четырнадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 15, year: 2025, location: 'Париж', popupId: '15', title: 'Пятьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 16, year: 2024, location: 'Токио', popupId: '16', title: 'Шестьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 17, year: 2025, location: 'Париж', popupId: '17', title: 'Семьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 18, year: 2023, location: 'Нью-Йорк', popupId: '18', title: 'Восемьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 19, year: 2024, location: 'Токио', popupId: '19', title: 'Девятьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 20, year: 2025, location: 'Лондон', popupId: '20', title: 'Двадцатый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 21, year: 2024, location: 'Токио', popupId: '21', title: 'Двадцать первый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 22, year: 2025, location: 'Париж', popupId: '22', title: 'Двадцать второй сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 23, year: 2023, location: 'Нью-Йорк', popupId: '23', title: 'Двадцать третий сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 24, year: 2024, location: 'Токио', popupId: '24', title: 'Двадцать четвёртый сон', description: 'Краткое описание...', audioUrl: null },
+        { id: 25, year: 2025, location: 'Лондон', popupId: '25', title: 'Двадцать пятый сон', description: 'Краткое описание...', audioUrl: null }
     ];
 
 
@@ -31,7 +50,7 @@
         return div.innerHTML;
     }
     function getUniqueLocations() {
-        return [...new Set(dreams.map(d => d.location))].sort((a, b) => a.localeCompare(b, 'ru'));
+        return [...new Set(dreams.map(d => d.location))].sort((a, b) => a.localeCompare(b));
     }
 
 
@@ -86,16 +105,17 @@
     }
 
     let currentFilter = 'all';
-    let currentSort = 'year-desc';
+    let currentSort = 'id-asc';
 
     function applyFiltersAndSort() {
         let filtered = [...dreams];
         if (currentFilter !== 'all') filtered = filtered.filter(d => d.location === currentFilter);
         switch (currentSort) {
+            case 'id-asc': filtered.sort((a, b) => a.id - b.id); break;
             case 'year-desc': filtered.sort((a, b) => b.year - a.year); break;
             case 'year-asc': filtered.sort((a, b) => a.year - b.year); break;
-            case 'location-asc': filtered.sort((a, b) => a.location.localeCompare(b.location, 'ru')); break;
-            case 'location-desc': filtered.sort((a, b) => b.location.localeCompare(a.location, 'ru')); break;
+            case 'location-asc': filtered.sort((a, b) => a.location.localeCompare(b.location)); break;
+            case 'location-desc': filtered.sort((a, b) => b.location.localeCompare(a.location)); break;
         }
         renderDreams(filtered);
     }
@@ -109,6 +129,7 @@
     }
 
     document.getElementById('filter-tabs').addEventListener('click', (e) => {
+        e.stopPropagation();
         const btn = e.target.closest('.dreams-filter__tab');
         if (!btn) return;
         document.querySelectorAll('.dreams-filter__tab').forEach(b => b.classList.remove('dreams-filter__tab--active'));
@@ -118,6 +139,7 @@
     });
 
     document.getElementById('sort-tabs').addEventListener('click', (e) => {
+        e.stopPropagation();
         const btn = e.target.closest('.dreams-sort__tab');
         if (!btn) return;
         document.querySelectorAll('.dreams-sort__tab').forEach(b => b.classList.remove('dreams-sort__tab--active'));
@@ -178,52 +200,55 @@
         });
     }
 
-
-
     // =====================
-    // 10. ПЛЕЕР (с корректными обработчиками и защитой от тройного клика)
+    // 10. ПЛЕЕР + ЭМБИЕНТ (статичный бар)
     // =====================
-    let playerBar, playerToggle, playerInfo;
+    const playerBar = document.getElementById('dreams-player');
+    const playerToggle = document.getElementById('player-toggle');
+    const playerInfo = document.getElementById('player-info');
+    // const ambientBtn = document.getElementById('ambient-toggle');
 
-    function createPlayer() {
-        const app = document.getElementById('dreams-app');
-        if (!app) return;
-
-        const player = document.createElement('div');
-        player.id = 'dreams-player';
-        player.className = 'dreams-player';
-        player.style.display = 'none';
-
-        const toggleBtn = document.createElement('button');
-        toggleBtn.id = 'player-toggle';
-        toggleBtn.className = 'player-toggle';
-        toggleBtn.innerHTML = `
-    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M7 4v16l13 -8z" />
-    </svg>`;
-
-        const infoSpan = document.createElement('span');
-        infoSpan.id = 'player-info';
-        infoSpan.className = 'player-info';
-
-        player.appendChild(toggleBtn);
-        player.appendChild(infoSpan);
-        app.appendChild(player);
-
-        playerBar = player;
-        playerToggle = toggleBtn;
-        playerInfo = infoSpan;
-
-        // Обработчик клика прямо здесь, когда кнопка уже существует
-        playerToggle.addEventListener('click', (e) => {
-            e.stopPropagation();               // не даём всплыть до #dreams-app
+    // Обработчик клика по плееру
+    if (playerToggle) {
+        playerToggle.addEventListener('click', (event) => {
+            event.stopPropagation();
             if (!voiceHowl) return;
             if (voicePlaying) {
                 voiceHowl.pause();
             } else {
                 voiceHowl.play();
             }
-            // updatePlayer вызовется через syncAudioButtons -> updatePlayer
+        });
+    }
+
+    // Обработчик эмбиента (заменяет старый, который был на ambientBtn)
+    if (ambientBtn) {
+        ambientBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            if (!ambientOn) {
+                ambient.volume(1.0);
+                ambient.play();
+                ambientBtn.classList.add('ambient-btn--on');
+                ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+        <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
+        <path d="M9 17v-13h10v13" />
+        <path d="M9 8h10" />
+      </svg>`;
+                ambientOn = true;
+            } else {
+                ambient.pause();
+                ambient.volume(0);
+                ambientBtn.classList.remove('ambient-btn--on');
+                ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
+        <path d="M14.42 14.45a3 3 0 1 0 4.138 4.119" />
+        <path d="M9 17v-8m0 -4v-1h10v11" />
+        <path d="M12 8h7" />
+        <path d="M3 3l18 18" />
+      </svg>`;
+                ambientOn = false;
+            }
         });
     }
 
@@ -233,7 +258,6 @@
             playerBar.style.display = 'flex';
             const dream = dreams.find(d => d.id === voiceDreamId);
             playerInfo.textContent = dream ? `${dream.title} (${dream.year} · ${dream.location})` : 'Сейчас играет';
-
             playerToggle.innerHTML = voicePlaying ?
                 `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
          <path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
@@ -253,9 +277,6 @@
         originalSync();
         updatePlayer();
     };
-
-
-
 
 
     grid.addEventListener('click', (e) => {
@@ -290,7 +311,10 @@
         voiceHowl = new Howl({
             src: [url],
             preload: true,
-            onplay: function () { voicePlaying = true; syncAudioButtons(); },
+            onplay: function () {
+                voicePlaying = true;
+                syncAudioButtons();
+            },
             onpause: function () { voicePlaying = false; syncAudioButtons(); },
             onstop: function () { voicePlaying = false; syncAudioButtons(); },
             onend: function () {
@@ -298,42 +322,11 @@
                 voiceDreamId = null;
                 voiceHowl = null;
                 syncAudioButtons();
-            }
+            },
         });
-
         voiceDreamId = dreamId;
         voiceHowl.play();
     });
-
-    ambientBtn.addEventListener('click', (event) => {
-        event.stopPropagation();
-
-        if (!ambientOn) {
-            ambient.volume(1.0);
-            ambient.play();
-            ambientBtn.classList.add('ambient-btn--on');
-            ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-        <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
-        <path d="M9 17v-13h10v13" />
-        <path d="M9 8h10" />
-      </svg>`;
-            ambientOn = true;
-        } else {
-            ambient.pause();
-            ambient.volume(0);
-            ambientBtn.classList.remove('ambient-btn--on');
-            ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
-        <path d="M14.42 14.45a3 3 0 1 0 4.138 4.119" />
-        <path d="M9 17v-8m0 -4v-1h10v11" />
-        <path d="M12 8h7" />
-        <path d="M3 3l18 18" />
-      </svg>`;
-            ambientOn = false;
-        }
-    });
-
 
     document.addEventListener('keydown', (e) => {
         if (e.ctrlKey && e.shiftKey && e.key === 'D') {
@@ -343,25 +336,39 @@
         }
     });
 
-    const titleElement = document.getElementById('dreams-app');
-    if (titleElement) {
+    // const titleElement = document.getElementById('dreams-app');
+    // if (titleElement) {
+    //     let clickCount = 0;
+    //     let clickTimer = null;
+    //     titleElement.addEventListener('click', () => {
+    //         clickCount++;
+    //         if (clickCount === 3) {
+    //             localStorage.removeItem(STORAGE_KEY);
+    //             location.reload();
+    //         }
+    //         clearTimeout(clickTimer);
+    //         clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+    //     });
+    // }
+
+    const secretReset = document.getElementById('secret-reset');
+    if (secretReset) {
         let clickCount = 0;
         let clickTimer = null;
-        titleElement.addEventListener('click', () => {
+        secretReset.addEventListener('click', (event) => {
+            event.stopPropagation();
             clickCount++;
-            if (clickCount === 3) {
+            if (clickCount >= 3) {
                 localStorage.removeItem(STORAGE_KEY);
                 location.reload();
             }
             clearTimeout(clickTimer);
-            clickTimer = setTimeout(() => { clickCount = 0; }, 500);
+            clickTimer = setTimeout(() => { clickCount = 0; }, 800);
         });
     }
 
-
     buildFilterTabs();
     applyFiltersAndSort();
-    createPlayer();
     updatePlayer();
 
 })();
