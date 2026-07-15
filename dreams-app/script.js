@@ -1,35 +1,42 @@
 (function () {
     'use strict';
 
+ 
+    // 1. Data loading 
 
-    const dreams = [
-        { id: 1, year: 2025, location: 'Париж', popupId: '1', title: 'Первый сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/audio_1.mp3' },
-        { id: 2, year: 2024, location: 'Токио', popupId: '2', title: 'Второй сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 3, year: 2025, location: 'Париж', popupId: '3', title: 'Третий сон', description: 'Краткое описание...', audioUrl: 'https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/audio_2.wav' },
-        { id: 4, year: 2023, location: 'Нью-Йорк', popupId: '4', title: 'Четвёртый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 5, year: 2024, location: 'Токио', popupId: '5', title: 'Пятый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 6, year: 2025, location: 'Лондон', popupId: '6', title: 'Шестой сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 7, year: 2025, location: 'Париж', popupId: '7', title: 'Седьмой сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 8, year: 2024, location: 'Токио', popupId: '8', title: 'Восьмой сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 9, year: 2025, location: 'Париж', popupId: '9', title: 'Девятый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 10, year: 2023, location: 'Нью-Йорк', popupId: '10', title: 'Десятый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 11, year: 2024, location: 'Токио', popupId: '11', title: 'Одиннадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 12, year: 2025, location: 'Лондон', popupId: '12', title: 'Двенадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 13, year: 2024, location: 'Токио', popupId: '13', title: 'Тринадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 14, year: 2025, location: 'Лондон', popupId: '14', title: 'Четырнадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 15, year: 2025, location: 'Париж', popupId: '15', title: 'Пятьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 16, year: 2024, location: 'Токио', popupId: '16', title: 'Шестьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 17, year: 2025, location: 'Париж', popupId: '17', title: 'Семьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 18, year: 2023, location: 'Нью-Йорк', popupId: '18', title: 'Восемьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 19, year: 2024, location: 'Токио', popupId: '19', title: 'Девятьнадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 20, year: 2025, location: 'Лондон', popupId: '20', title: 'Двадцатый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 21, year: 2024, location: 'Токио', popupId: '21', title: 'Двадцать первый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 22, year: 2025, location: 'Париж', popupId: '22', title: 'Двадцать второй сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 23, year: 2023, location: 'Нью-Йорк', popupId: '23', title: 'Двадцать третий сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 24, year: 2024, location: 'Токио', popupId: '24', title: 'Двадцать четвёртый сон', description: 'Краткое описание...', audioUrl: null },
-        { id: 25, year: 2025, location: 'Лондон', popupId: '25', title: 'Двадцать пятый сон', description: 'Краткое описание...', audioUrl: null }
-    ];
+    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQITS5CstuDRDakSdIX02kOiEMCmoF1Kflh56TQXfdSaoOjJUB50E3D8wwxNnZE8peKrkpXDjgnFMt9/pub?gid=0&single=true&output=csv';
+    let dreams = [];
 
+    async function loadDreams() {
+        try {
+            const response = await fetch(CSV_URL + '&t=' + Date.now());
+            if (!response.ok) throw new Error('Network error');
+            const csvText = await response.text();
+
+            // Используем PapaParse для корректного разбора CSV с кавычками и запятыми
+            const result = Papa.parse(csvText, {
+                header: true,           // первая строка — заголовки
+                skipEmptyLines: true,
+                trimHeaders: true,
+                trimValues: true
+            });
+
+            dreams = result.data.map(row => ({
+                ...row,
+                id: parseInt(row.id, 10) || 0,
+                year: parseInt(row.year, 10) || 0
+            })).filter(d => d.id > 0);
+        } catch (err) {
+            console.warn('CSV load failed, using local data.js', err);
+            dreams = window.dreamsData || [];
+        }
+
+        buildFilterTabs();
+        applyFiltersAndSort();
+        updatePlayer();
+    }
+
+    // 2. Dreams read
 
     const STORAGE_KEY = 'dreams_read';
     function getReadDreams() {
@@ -43,16 +50,44 @@
         }
     }
 
+    // 3. Utils
 
     function escapeHtml(text) {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
     }
+
+    function applyTypography(text) {
+        if (!text) return text;
+        // Список коротких слов, после которых пробел заменяется на неразрывный
+        const shortWords = [
+            'a', 'an', 'the', 'in', 'on', 'at', 'by', 'for', 'to', 'of', 'with',
+            'and', 'or', 'but', 'nor', 'so', 'yet', 'not', 'from', 'into', 'onto',
+            'upon', 'within', 'without', 'over', 'under', 'above', 'below',
+            'between', 'among', 'through', 'during', 'before', 'after',
+            'behind', 'beside', 'along', 'around', 'down', 'up', 'off', 'out',
+            'is', 'are', 'was', 'were', 'be', 'been', 'being',
+            'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing',
+            'will', 'would', 'shall', 'should', 'may', 'might', 'must', 'can', 'could',
+            'I', 'you', 'he', 'she', 'it', 'we', 'they',
+            'me', 'him', 'her', 'us', 'them',
+            'my', 'your', 'his', 'its', 'our', 'their',
+            'mine', 'yours', 'hers', 'ours', 'theirs',
+            'this', 'that', 'these', 'those',
+            'no', 'not', 'as', 'if', 'or'
+        ];
+        // Ищем короткое слово + пробел (учитываем границы слова, регистр)
+        const regex = new RegExp(`\\b(${shortWords.join('|')})\\s+`, 'gi');
+        return text.replace(regex, (match, p1) => p1 + '\u00A0');
+    }
+
     function getUniqueLocations() {
         return [...new Set(dreams.map(d => d.location))].sort((a, b) => a.localeCompare(b));
     }
 
+
+    // 4. Render of Cards
 
     const grid = document.getElementById('dreams-grid');
     const countSpan = document.getElementById('dreams-count-value');
@@ -62,7 +97,7 @@
         const html = dreamsArray.map(dream => {
             const isRead = readIds.includes(dream.id);
             const readHtml = `
-        <a href="#${dream.popupId}" class="dream-card__link" role="button" aria-haspopup="dialog" data-dream-id="${dream.id}">
+        <button class="dream-card__link" data-dream-id="${dream.id}" aria-expanded="false">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
@@ -72,7 +107,7 @@
             <path d="M21 6l0 13" />
           </svg>
           READ
-        </a>
+        </button>
       `;
             const audioHtml = dream.audioUrl ? `
         <button class="dream-card__audio-btn" data-audio="${escapeHtml(dream.audioUrl)}" data-dream-id="${dream.id}">
@@ -86,23 +121,29 @@
         </button>
       ` : '';
             return `
-        <div class="dream-card ${isRead ? 'dream-card--read' : ''}" data-dream-id="${dream.id}">
-          <div class="dream-card__content">
-            <h3 class="dream-card__title">${escapeHtml(dream.title)}</h3>
-            <p class="dream-card__meta">${dream.year} · ${escapeHtml(dream.location)}</p>
-            <p class="dream-card__desc">${escapeHtml(dream.description)}</p>
-          </div>
-          <div class="dream-card__actions">
-            ${readHtml}
-            ${audioHtml}
-          </div>
-        </div>
-      `;
+  <div class="dream-card ${isRead ? 'dream-card--read' : ''}" data-dream-id="${dream.id}">
+    <div class="dream-card__content">
+      <h3 class="dream-card__title">${escapeHtml(applyTypography(dream.dreamer || 'Untitled'))}</h3>
+      <p class="dream-card__meta">${escapeHtml(dream.yearDisplay || dream.year)} · ${escapeHtml(dream.place || dream.location)}</p>
+      ${dream.description ? `<p class="dream-card__desc">${escapeHtml(applyTypography(dream.description))}</p>` : ''}
+      <div class="dream-card__details" style="display: none;">
+        <div class="dream-card__source"><strong>Source:</strong> ${escapeHtml(applyTypography(dream.source || ''))}</div>
+        <div class="dream-card__fulltext">${escapeHtml(applyTypography(dream.fullText || ''))}</div>
+      </div>
+    </div>
+    <div class="dream-card__actions">
+      ${readHtml}
+      ${audioHtml}
+    </div>
+  </div>
+`;
         }).join('');
         grid.innerHTML = html;
         countSpan.textContent = dreamsArray.length;
         syncAudioButtons();
     }
+
+    // 5. Filters, Sort
 
     let currentFilter = 'all';
     let currentSort = 'id-asc';
@@ -123,9 +164,36 @@
     function buildFilterTabs() {
         const tabsContainer = document.getElementById('filter-tabs');
         const locations = getUniqueLocations();
-        const allTab = `<button class="dreams-filter__tab dreams-filter__tab--active" data-location="all">Все</button>`;
+        const allTab = `<button class="dreams-filter__tab dreams-filter__tab--active" data-location="all">All</button>`;
         const locationTabs = locations.map(loc => `<button class="dreams-filter__tab" data-location="${escapeHtml(loc)}">${escapeHtml(loc)}</button>`).join('');
         tabsContainer.innerHTML = allTab + locationTabs;
+    }
+
+    // FLIP-animaton
+    function flipSort(sortFunction) {
+        const oldCards = document.querySelectorAll('.dream-card');
+        const oldPositions = {};
+        oldCards.forEach(card => {
+            const id = card.dataset.dreamId;
+            if (id) oldPositions[id] = card.getBoundingClientRect();
+        });
+        sortFunction();
+        const newCards = document.querySelectorAll('.dream-card');
+        newCards.forEach(card => {
+            const id = card.dataset.dreamId;
+            const oldRect = oldPositions[id];
+            const newRect = card.getBoundingClientRect();
+            if (!oldRect) {
+                gsap.from(card, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.out' });
+                return;
+            }
+            const deltaX = oldRect.left - newRect.left;
+            const deltaY = oldRect.top - newRect.top;
+            if (deltaX !== 0 || deltaY !== 0) {
+                gsap.set(card, { x: deltaX, y: deltaY });
+                gsap.to(card, { x: 0, y: 0, duration: 0.4, ease: 'power2.out' });
+            }
+        });
     }
 
     document.getElementById('filter-tabs').addEventListener('click', (e) => {
@@ -135,7 +203,7 @@
         document.querySelectorAll('.dreams-filter__tab').forEach(b => b.classList.remove('dreams-filter__tab--active'));
         btn.classList.add('dreams-filter__tab--active');
         currentFilter = btn.dataset.location;
-        applyFiltersAndSort();
+        flipSort(() => applyFiltersAndSort());
     });
 
     document.getElementById('sort-tabs').addEventListener('click', (e) => {
@@ -145,24 +213,57 @@
         document.querySelectorAll('.dreams-sort__tab').forEach(b => b.classList.remove('dreams-sort__tab--active'));
         btn.classList.add('dreams-sort__tab--active');
         currentSort = btn.dataset.sort;
-        applyFiltersAndSort();
+        flipSort(() => applyFiltersAndSort());
     });
 
+    // 6. card: read checking and card opening
 
-    grid.addEventListener('click', (e) => {
-        const link = e.target.closest('.dream-card__link');
+    grid.addEventListener('click', (event) => {
+        const link = event.target.closest('.dream-card__link');
         if (!link) return;
+
         const dreamId = parseInt(link.dataset.dreamId, 10);
-        if (!isNaN(dreamId)) {
+        if (isNaN(dreamId)) return;
+
+        const card = link.closest('.dream-card');
+        if (!card) return;
+
+        const details = card.querySelector('.dream-card__details');
+        if (!details) return;
+
+        const isHidden = details.style.display === 'none';
+
+        if (isHidden) {
+            // Открываем – НЕ отмечаем прочитанным
+            details.style.display = 'block';
+            link.setAttribute('aria-expanded', 'true');
+            link.innerHTML = `
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 6l-12 12" /><path d="M6 6l12 12" />
+      </svg> CLOSE`;
+        } else {
+            // Закрываем – теперь отмечаем прочитанным
+            details.style.display = 'none';
+            link.setAttribute('aria-expanded', 'false');
+            link.innerHTML = `
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
+        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+        <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+        <path d="M3 6l0 13" />
+        <path d="M12 6l0 13" />
+        <path d="M21 6l0 13" />
+      </svg> READ`;
+
+            // Помечаем сон прочитанным
             markAsRead(dreamId);
-            const card = link.closest('.dream-card');
-            if (card) card.classList.add('dream-card--read');
+            card.classList.add('dream-card--read');
         }
     });
 
+    // 7. Audio & Player
 
     const ambientBtn = document.getElementById('ambient-toggle');
-
     const ambient = new Howl({
         src: ['https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/ambient.wav'],
         loop: true,
@@ -200,15 +301,10 @@
         });
     }
 
-    // =====================
-    // 10. ПЛЕЕР + ЭМБИЕНТ (статичный бар)
-    // =====================
     const playerBar = document.getElementById('dreams-player');
     const playerToggle = document.getElementById('player-toggle');
     const playerInfo = document.getElementById('player-info');
-    // const ambientBtn = document.getElementById('ambient-toggle');
 
-    // Обработчик клика по плееру
     if (playerToggle) {
         playerToggle.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -221,7 +317,6 @@
         });
     }
 
-    // Обработчик эмбиента (заменяет старый, который был на ambientBtn)
     if (ambientBtn) {
         ambientBtn.addEventListener('click', (event) => {
             event.stopPropagation();
@@ -257,7 +352,7 @@
         if (voiceHowl) {
             playerBar.style.display = 'flex';
             const dream = dreams.find(d => d.id === voiceDreamId);
-            playerInfo.textContent = dream ? `${dream.title} (${dream.year} · ${dream.location})` : 'Сейчас играет';
+            playerInfo.textContent = dream ? `${dream.dreamer || 'Untitled'} · ${dream.yearDisplay || dream.year}` : 'In Focus';
             playerToggle.innerHTML = voicePlaying ?
                 `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
          <path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
@@ -271,13 +366,11 @@
         }
     }
 
-    // Подключаем обновление плеера к syncAudioButtons
     const originalSync = syncAudioButtons;
     syncAudioButtons = function () {
         originalSync();
         updatePlayer();
     };
-
 
     grid.addEventListener('click', (e) => {
         const btn = e.target.closest('.dream-card__audio-btn');
@@ -336,21 +429,6 @@
         }
     });
 
-    // const titleElement = document.getElementById('dreams-app');
-    // if (titleElement) {
-    //     let clickCount = 0;
-    //     let clickTimer = null;
-    //     titleElement.addEventListener('click', () => {
-    //         clickCount++;
-    //         if (clickCount === 3) {
-    //             localStorage.removeItem(STORAGE_KEY);
-    //             location.reload();
-    //         }
-    //         clearTimeout(clickTimer);
-    //         clickTimer = setTimeout(() => { clickCount = 0; }, 500);
-    //     });
-    // }
-
     const secretReset = document.getElementById('secret-reset');
     if (secretReset) {
         let clickCount = 0;
@@ -367,8 +445,7 @@
         });
     }
 
-    buildFilterTabs();
-    applyFiltersAndSort();
-    updatePlayer();
-
+    // 8. Start
+    
+    loadDreams();
 })();

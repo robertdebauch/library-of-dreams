@@ -9,10 +9,9 @@
 
 <body>
   <div id="dreams-app">
-    <!-- ФИЛЬТРЫ -->
     <div class="dreams-controls">
       <div class="dreams-filter">
-        <span class="dreams-filter__label">Локация</span>
+        <span class="dreams-filter__label">Chapter of the experience</span>
         <div class="tab-divider"></div>
         <div class="dreams-filter__tabs" id="filter-tabs">
           <!-- табы вставятся динамически -->
@@ -20,25 +19,25 @@
       </div>
 
       <div class="dreams-sort">
-        <span class="dreams-sort__label">Сортировка</span>
+        <span class="dreams-sort__label">Order by</span>
         <div class="tab-divider"></div>
         <div class="dreams-sort__tabs" id="sort-tabs">
-          <button class="dreams-sort__tab" data-sort="id-asc">По порядку</button>
-          <button class="dreams-sort__tab dreams-sort__tab--active" data-sort="year-desc">Новые</button>
-          <button class="dreams-sort__tab" data-sort="year-asc">Старые</button>
-          <button class="dreams-sort__tab" data-sort="location-asc">А-Я</button>
-          <button class="dreams-sort__tab" data-sort="location-desc">Я-А</button>
+          <button class="dreams-sort__tab dreams-sort__tab--active" data-sort="id-asc">As Added</button>
+          <button class="dreams-sort__tab" data-sort="year-desc">Recent</button>
+          <button class="dreams-sort__tab" data-sort="year-asc">Timeline</button>
+          <button class="dreams-sort__tab" data-sort="location-asc">A-Z</button>
+          <button class="dreams-sort__tab" data-sort="location-desc">Z-A</button>
         </div>
       </div>
     </div>
 
-    <!-- СЧЁТЧИК -->
-    <div class="dreams-count">Найдено снов: <span id="dreams-count-value">0</span></div>
+    
+    <div class="dreams-count">Total dreams: <span id="dreams-count-value">0</span></div>
 
-    <!-- СЕТКА КАРТОЧЕК -->
+    
     <div class="dreams-grid" id="dreams-grid"></div>
 
-    <!-- ОБЩИЙ БАР ПЛЕЕРА И ЭМБИЕНТА -->
+    
     <div id="dreams-bottom-bar" class="dreams-bottom-bar">
       <div id="dreams-player" class="dreams-player" style="display: none;">
         <button id="player-toggle" class="player-toggle">
@@ -60,12 +59,14 @@
       </button>
     </div>
 
-    <div id="secret-reset" class="secret-reset" title="Сбросить прогресс (3 клика)"></div>
+    <div id="secret-reset" class="secret-reset" title="Reset progress (3)"></div>
 
   </div>
 
 
   <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
 
   <link rel="stylesheet" href="./style.css">
