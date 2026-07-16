@@ -147,6 +147,7 @@ body {
 /* --- Сетка карточек --- */
 .dreams-grid {
   display: grid;
+  align-items: start;
   /* grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); */
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: var(--space-5);
@@ -213,12 +214,14 @@ body {
   padding-top: var(--space-4);
   border-top: 1px solid var(--stroke-middle);
 }
+
 .dream-card__dreamer {
   font-size: var(--fontSize-2);
   color: var(--color-lightgrey);
   margin-bottom: var(--space-3);
   line-height: 1.5;
 }
+
 .dream-card__fulltext {
   text-wrap: pretty;
   font-size: var(--fontSize-2);
@@ -328,7 +331,7 @@ body {
   position: static;
   z-index: auto;
   /* padding: var(--space-2); */
-  
+
   padding: var(--space-2) var(--space-3);
   font-size: var(--fontSize-1);
   /* line-height: 1.4; */
@@ -363,7 +366,8 @@ body {
 }
 
 .secret-reset {
-  position: fixed;       /* или absolute, если бар фиксирован */
+  position: fixed;
+  /* или absolute, если бар фиксирован */
   bottom: 0;
   left: 0;
   width: 24px;
@@ -414,3 +418,30 @@ body {
     max-width: 600px;
   }
 }
+
+.dream-card--expanded {
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.dreams-bottom-bar {
+  pointer-events: none;
+}
+
+.ambient-btn,
+#dreams-player {
+  pointer-events: auto;
+}
+
+@media (hover: hover) {
+  .dream-card__link:hover {
+    color: var(--color-accent);
+  }
+}
+
+/* .dreams-grid {
+  align-items: stretch;
+}
+
+.dreams-grid:has(.dream-card--expanded) {
+  align-items: start;
+}  */

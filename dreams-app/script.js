@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
- 
+
     // 1. Data loading 
 
     const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQITS5CstuDRDakSdIX02kOiEMCmoF1Kflh56TQXfdSaoOjJUB50E3D8wwxNnZE8peKrkpXDjgnFMt9/pub?gid=0&single=true&output=csv';
@@ -234,15 +234,42 @@
         const isHidden = details.style.display === 'none';
 
         if (isHidden) {
-            // Открываем – НЕ отмечаем прочитанным
+            // Закрываем все остальные открытые карточки
+            document.querySelectorAll('.dream-card__details[style*="display: block"]').forEach(otherDetails => {
+                if (otherDetails !== details) {
+                    otherDetails.style.display = 'none';
+                    otherDetails.closest('.dream-card').classList.remove('dream-card--expanded');
+                    const otherLink = otherDetails.closest('.dream-card').querySelector('.dream-card__link');
+                    if (otherLink) {
+                        otherLink.setAttribute('aria-expanded', 'false');
+                        otherLink.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+              <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+              <path d="M3 6l0 13" />
+              <path d="M12 6l0 13" />
+              <path d="M21 6l0 13" />
+            </svg>
+            READ`;
+                        otherLink.blur(); // убираем фокус с закрытой кнопки
+                    }
+                }
+            });
+
+            // Открываем текущую
+            card.classList.add('dream-card--expanded');
+            
             details.style.display = 'block';
             link.setAttribute('aria-expanded', 'true');
             link.innerHTML = `
       <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 6l-12 12" /><path d="M6 6l12 12" />
       </svg> CLOSE`;
+            link.blur(); // сразу убираем фокус, чтобы на мобильных не подсвечивался
+            card.classList.add('dream-card--expanded');
         } else {
-            // Закрываем – теперь отмечаем прочитанным
+            // Закрываем текущую
             details.style.display = 'none';
             link.setAttribute('aria-expanded', 'false');
             link.innerHTML = `
@@ -254,10 +281,17 @@
         <path d="M12 6l0 13" />
         <path d="M21 6l0 13" />
       </svg> READ`;
+            link.blur();
+            card.classList.remove('dream-card--expanded');
 
-            // Помечаем сон прочитанным
+            // Отмечаем прочитанным
             markAsRead(dreamId);
             card.classList.add('dream-card--read');
+
+            // Возвращаемся к карточке (чтобы не уезжала вверх)
+            setTimeout(() => {
+                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 50);
         }
     });
 
@@ -446,6 +480,6 @@
     }
 
     // 8. Start
-    
+
     loadDreams();
 })();
