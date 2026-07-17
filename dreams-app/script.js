@@ -243,6 +243,45 @@
                     if (otherLink) {
                         otherLink.setAttribute('aria-expanded', 'false');
                         otherLink.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
+                          <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                          <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+                          <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
+                          <path d="M3 6l0 13" />
+                          <path d="M12 6l0 13" />
+                          <path d="M21 6l0 13" />
+                        </svg>
+                        READ`;
+                        otherLink.blur();
+                    }
+                }
+            });
+
+            // Временно убираем затемнение, если карточка уже прочитана
+            const wasRead = card.classList.contains('dream-card--read');
+            if (wasRead) {
+                card.classList.remove('dream-card--read');
+            }
+
+            // Открываем текущую
+            details.style.display = 'block';
+            link.setAttribute('aria-expanded', 'true');
+            link.innerHTML = `
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6l-12 12" /><path d="M6 6l12 12" />
+            </svg> CLOSE`;
+            link.blur();
+
+            // Добавляем класс expanded (один раз)
+            card.classList.add('dream-card--expanded');
+
+            // Сохраняем флаг, чтобы при закрытии знать, было ли прочитано
+            card.dataset.wasRead = wasRead ? '1' : '0';
+        } else {
+            // Закрываем текущую
+            details.style.display = 'none';
+            link.setAttribute('aria-expanded', 'false');
+            link.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
               <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
@@ -250,45 +289,22 @@
               <path d="M3 6l0 13" />
               <path d="M12 6l0 13" />
               <path d="M21 6l0 13" />
-            </svg>
-            READ`;
-                        otherLink.blur(); // убираем фокус с закрытой кнопки
-                    }
-                }
-            });
-
-            // Открываем текущую
-            card.classList.add('dream-card--expanded');
-            
-            details.style.display = 'block';
-            link.setAttribute('aria-expanded', 'true');
-            link.innerHTML = `
-      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M18 6l-12 12" /><path d="M6 6l12 12" />
-      </svg> CLOSE`;
-            link.blur(); // сразу убираем фокус, чтобы на мобильных не подсвечивался
-            card.classList.add('dream-card--expanded');
-        } else {
-            // Закрываем текущую
-            details.style.display = 'none';
-            link.setAttribute('aria-expanded', 'false');
-            link.innerHTML = `
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
-        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-        <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-        <path d="M3 6l0 13" />
-        <path d="M12 6l0 13" />
-        <path d="M21 6l0 13" />
-      </svg> READ`;
+            </svg> READ`;
             link.blur();
+
+            // Убираем expanded
             card.classList.remove('dream-card--expanded');
 
-            // Отмечаем прочитанным
+            // Отмечаем прочитанным, если ещё не было
             markAsRead(dreamId);
             card.classList.add('dream-card--read');
 
-            // Возвращаемся к карточке (чтобы не уезжала вверх)
+            // Если перед открытием карточка была прочитана, то класс уже должен быть,
+            // но на всякий случай добавили (markAsRead и add).
+            // Можно убрать data-атрибут
+            delete card.dataset.wasRead;
+
+            // Возвращаемся к карточке
             setTimeout(() => {
                 card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 50);
@@ -377,6 +393,59 @@
         <path d="M3 3l18 18" />
       </svg>`;
                 ambientOn = false;
+            }
+        });
+    }
+
+    const resetBtn = document.getElementById('reset-progress');
+    const confirmDialog = document.getElementById('confirm-dialog');
+    const confirmText = document.getElementById('confirm-text');
+    const confirmYes = document.getElementById('confirm-yes');
+    const confirmNo = document.getElementById('confirm-no');
+
+    // Функция для показа диалога
+    function showConfirmDialog() {
+        console.log('showConfirmDialog called', confirmDialog);
+        if (!confirmDialog) return;
+        confirmText.textContent = 'Clear all read progress?'; // ← вот это
+        confirmDialog.classList.add('is-visible');
+    }
+
+    // Функция для скрытия диалога
+    function hideConfirmDialog() {
+        if (!confirmDialog) return;
+        confirmDialog.classList.remove('is-visible');
+    }
+
+    if (resetBtn && confirmDialog) {
+        resetBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            showConfirmDialog();
+        });
+
+        confirmYes.addEventListener('click', () => {
+            localStorage.removeItem(STORAGE_KEY);
+            hideConfirmDialog();
+            applyFiltersAndSort();   // мягко перерисовываем все карточки
+        });
+
+        confirmNo.addEventListener('click', () => {
+            hideConfirmDialog();
+        });
+
+        // Закрытие по клику на фон (сам диалог)
+        confirmDialog.addEventListener('click', (e) => {
+            if (e.target === confirmDialog) {
+                hideConfirmDialog();
+            }
+        });
+
+        // Закрытие по клику в любом месте вне диалога
+        document.addEventListener('click', (e) => {
+            if (!confirmDialog.classList.contains('is-visible')) return;
+            // Если клик вне диалога и не по кнопке сброса
+            if (!confirmDialog.contains(e.target) && e.target !== resetBtn) {
+                hideConfirmDialog();
             }
         });
     }

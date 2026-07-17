@@ -148,7 +148,6 @@ body {
 .dreams-grid {
   display: grid;
   align-items: start;
-  /* grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); */
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: var(--space-5);
 }
@@ -250,15 +249,10 @@ body {
   transition: opacity 0.15s, color 0.15s;
 }
 
-.dream-card__link:hover,
-.dream-card__audio-btn:hover {
-  color: var(--color-accent);
-}
-
 .dream-card__audio-btn .icon,
 .dream-card__link .icon {
-  width: 1em;
-  height: 1em;
+  width: 1rem;
+  height: 1rem;
 }
 
 /* --- Нижний бар (плеер + эмбиент) --- */
@@ -326,16 +320,13 @@ body {
   flex-direction: column;
 }
 
-/* Кнопка эмбиента */
-.ambient-btn {
+/* Общие стили для кнопок в баре (Ambient и Reset) */
+.ambient-btn,
+.reset-progress {
   position: static;
   z-index: auto;
-  /* padding: var(--space-2); */
-
   padding: var(--space-2) var(--space-3);
   font-size: var(--fontSize-1);
-  /* line-height: 1.4; */
-
   border-radius: calc(var(--radii-1) / 2);
   border: 1px solid var(--stroke-dark);
   background: var(--black-color);
@@ -349,20 +340,23 @@ body {
   flex-shrink: 0;
 }
 
-.ambient-btn:hover {
+.ambient-btn:hover,
+.reset-progress:hover {
   color: var(--shadow-color);
   background-color: var(--stroke-dark);
 }
 
+.ambient-btn .icon,
+.reset-progress .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+/* Уникальное состояние для Ambient (активен) */
 .ambient-btn--on {
   background: var(--shadow-color);
   color: var(--color-lightest-grey);
   border-color: var(--shadow-color);
-}
-
-.ambient-btn .icon {
-  width: 1.2rem;
-  height: 1.2rem;
 }
 
 .secret-reset {
@@ -375,6 +369,93 @@ body {
   opacity: 0;
   cursor: pointer;
   z-index: 9999;
+}
+
+/* Диалог подтверждения */
+/* .confirm-dialog {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--black-color);
+  border: 1px solid var(--stroke-dark);
+  border-radius: var(--radii-1);
+  padding: var(--space-4);
+  z-index: 1000;
+  text-align: center;
+}
+
+.confirm-text {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fontSize-2);
+  color: var(--color-text);
+}
+
+.confirm-actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.confirm-btn {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--stroke-dark);
+  border-radius: calc(var(--radii-1) / 2);
+  background: var(--dark-grey-color);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.confirm-btn--cancel {
+  background: transparent;
+  color: var(--color-lightgrey);
+} */
+
+/* Диалог подтверждения */
+.confirm-dialog {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--black-color);
+  border: 1px solid var(--stroke-dark);
+  border-radius: var(--radii-1);
+  padding: var(--space-4);
+  z-index: 1000;
+  text-align: center;
+  max-width: calc(100vw - 40px);
+  width: 280px;
+  /* Плавное появление */
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s;
+}
+.confirm-dialog.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+.confirm-text {
+  margin: 0 0 var(--space-3);
+  font-size: var(--fontSize-2);
+  color: var(--color-text);
+}
+.confirm-actions {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+.confirm-btn {
+  padding: var(--space-2) var(--space-4); /* побольше для пальцев */
+  border: 1px solid var(--stroke-dark);
+  border-radius: calc(var(--radii-1) / 2);
+  background: var(--dark-grey-color);
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: var(--fontSize-1);
+}
+.confirm-btn--cancel {
+  background: transparent;
+  color: var(--color-lightgrey);
 }
 
 /* --- Адаптивность --- */
@@ -428,20 +509,15 @@ body {
 }
 
 .ambient-btn,
-#dreams-player {
+#dreams-player,
+.reset-progress {
   pointer-events: auto;
 }
 
 @media (hover: hover) {
-  .dream-card__link:hover {
+
+  .dream-card__link:hover,
+  .dream-card__audio-btn:hover {
     color: var(--color-accent);
   }
 }
-
-/* .dreams-grid {
-  align-items: stretch;
-}
-
-.dreams-grid:has(.dream-card--expanded) {
-  align-items: start;
-}  */

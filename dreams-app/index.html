@@ -31,13 +31,13 @@
       </div>
     </div>
 
-    
+
     <div class="dreams-count">Total dreams: <span id="dreams-count-value">0</span></div>
 
-    
+
     <div class="dreams-grid" id="dreams-grid"></div>
 
-    
+
     <div id="dreams-bottom-bar" class="dreams-bottom-bar">
       <div id="dreams-player" class="dreams-player" style="display: none;">
         <button id="player-toggle" class="player-toggle">
@@ -57,10 +57,25 @@
           <path d="M9 8h10" />
         </svg>
       </button>
+      </button>
+      <button id="reset-progress" class="reset-progress" title="Reset reading progress">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" />
+          <path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" />
+        </svg>
+      </button>
     </div>
 
     <div id="secret-reset" class="secret-reset" title="Reset progress (3)"></div>
 
+    <div id="confirm-dialog" class="confirm-dialog">
+      <p id="confirm-text" class="confirm-text"></p>
+      <div class="confirm-actions">
+        <button id="confirm-yes" class="confirm-btn">Yes</button>
+        <button id="confirm-no" class="confirm-btn confirm-btn--cancel">No</button>
+      </div>
+    </div>
   </div>
 
 
