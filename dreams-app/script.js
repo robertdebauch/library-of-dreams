@@ -1,6 +1,56 @@
 (function () {
     'use strict';
+    
+    // 0. Bottom bar
+    let playerBar, playerToggle, playerInfo, ambientBtn, resetBtn;
 
+    function createBottomBar() {
+        if (!document.body) return;
+
+        const bar = document.createElement('div');
+        bar.id = 'dreams-bottom-bar';
+        bar.className = 'dreams-bottom-bar';
+
+        // Ambient
+        ambientBtn = document.createElement('button');
+        ambientBtn.id = 'ambient-toggle';
+        ambientBtn.className = 'ambient-btn';
+        ambientBtn.title = 'Фоновый звук';
+        ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M9 17v-13h10v13"/><path d="M9 8h10"/></svg>`;
+
+        // Reset
+        resetBtn = document.createElement('button');
+        resetBtn.id = 'reset-progress';
+        resetBtn.className = 'reset-progress';
+        resetBtn.title = 'Сбросить всё прочитанное';
+        resetBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>`;
+
+        // Player
+        playerBar = document.createElement('div');
+        playerBar.id = 'dreams-player';
+        playerBar.className = 'dreams-player';
+        playerBar.style.display = 'none';
+
+        playerToggle = document.createElement('button');
+        playerToggle.id = 'player-toggle';
+        playerToggle.className = 'player-toggle';
+        playerToggle.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13 -8z"/></svg>`;
+
+        playerInfo = document.createElement('span');
+        playerInfo.id = 'player-info';
+        playerInfo.className = 'player-info';
+
+        playerBar.appendChild(playerToggle);
+        playerBar.appendChild(playerInfo);
+
+        bar.appendChild(playerBar);
+        bar.appendChild(resetBtn);
+        bar.appendChild(ambientBtn);
+
+        document.body.appendChild(bar);
+    }
+
+    createBottomBar(); 
 
     // 1. Data loading 
 
@@ -184,14 +234,14 @@
             const oldRect = oldPositions[id];
             const newRect = card.getBoundingClientRect();
             if (!oldRect) {
-                gsap.from(card, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.out' });
+                gsap.from(card, { opacity: 0, y: 10, duration: 0.3, ease: 'power3.out' });
                 return;
             }
             const deltaX = oldRect.left - newRect.left;
             const deltaY = oldRect.top - newRect.top;
             if (deltaX !== 0 || deltaY !== 0) {
                 gsap.set(card, { x: deltaX, y: deltaY });
-                gsap.to(card, { x: 0, y: 0, duration: 0.4, ease: 'power2.out' });
+                gsap.to(card, { x: 0, y: 0, duration: 0.4, ease: 'power3.out' });
             }
         });
     }
@@ -313,7 +363,6 @@
 
     // 7. Audio & Player
 
-    const ambientBtn = document.getElementById('ambient-toggle');
     const ambient = new Howl({
         src: ['https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/ambient.wav'],
         loop: true,
@@ -350,10 +399,6 @@
             }
         });
     }
-
-    const playerBar = document.getElementById('dreams-player');
-    const playerToggle = document.getElementById('player-toggle');
-    const playerInfo = document.getElementById('player-info');
 
     if (playerToggle) {
         playerToggle.addEventListener('click', (event) => {
@@ -397,7 +442,7 @@
         });
     }
 
-    const resetBtn = document.getElementById('reset-progress');
+    // const resetBtn = document.getElementById('reset-progress');
     const confirmDialog = document.getElementById('confirm-dialog');
     const confirmText = document.getElementById('confirm-text');
     const confirmYes = document.getElementById('confirm-yes');

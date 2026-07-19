@@ -40,6 +40,10 @@ body {
   color: var(--color-text);
 }
 
+#dreams-bottom-bar {
+  font-family: var(--font);
+}
+
 /* --- Общий контейнер фильтров и сортировки --- */
 .dreams-controls {
   display: grid;
@@ -370,46 +374,6 @@ body {
   cursor: pointer;
   z-index: 9999;
 }
-
-/* Диалог подтверждения */
-/* .confirm-dialog {
-  position: fixed;
-  bottom: 80px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: var(--black-color);
-  border: 1px solid var(--stroke-dark);
-  border-radius: var(--radii-1);
-  padding: var(--space-4);
-  z-index: 1000;
-  text-align: center;
-}
-
-.confirm-text {
-  margin: 0 0 var(--space-3);
-  font-size: var(--fontSize-2);
-  color: var(--color-text);
-}
-
-.confirm-actions {
-  display: flex;
-  gap: var(--space-2);
-  justify-content: center;
-}
-
-.confirm-btn {
-  padding: var(--space-1) var(--space-3);
-  border: 1px solid var(--stroke-dark);
-  border-radius: calc(var(--radii-1) / 2);
-  background: var(--dark-grey-color);
-  color: var(--color-text);
-  cursor: pointer;
-}
-
-.confirm-btn--cancel {
-  background: transparent;
-  color: var(--color-lightgrey);
-} */
 
 /* Диалог подтверждения */
 .confirm-dialog {
