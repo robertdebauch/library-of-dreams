@@ -1,4 +1,3 @@
-/* === БАЗОВЫЕ ПЕРЕМЕННЫЕ === */
 :root {
   --color-text: #ffffff;
   --black-color: #121212;
@@ -14,7 +13,6 @@
   --color-accent: #ccc1ea;
 
   --font: 'Manrope', sans-serif;
-  --header: 'Voltaire', sans-serif;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -29,89 +27,24 @@
 }
 
 body {
-  margin: 0;
   background-color: var(--black-color);
 }
 
-/* === ОСНОВНАЯ СТРУКТУРА АРХИВА === */
-#archive-app {
-  background-color: var(--black-color);
-}
-
-.archive-layout {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 0;
-  max-width: 1400px;
-  margin: 0 auto;
-  padding: 0 var(--space-5);
-  /* column-gap: var(--space-5); */
-  box-sizing: border-box;
-}
-
-.archive-layout__main {
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  font-family: var(--font);
-}
-
-/* --- Three.js сцена --- */
-#particle-container {
-  width: 100%;
-  height: 640px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* --- Заголовок --- */
-.dreams-header {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  
-}
-
-.dreams-header__line {
-  width: 100%;
-  height: 1px;
-  background-color: var(--stroke-dark);
-}
-
-.dreams-header__title {
-  font-family: var(--header);
-  font-size: 3.5rem;
-  font-weight: 400;
-  line-height: 1.2;
-  color: var(--color-text);
-  padding: calc(var(--space-6) * 2) var(--space-5);
-  margin: 0;
-  text-align: center;
-}
-
-/* --- Боковая панель --- */
-.archive-layout__panel {
-  flex: 0 0 200px;
-  min-height: 400px;
-  background-color: var(--black-color);
-  border-left: 1px solid var(--stroke-dark);
-  align-self: stretch;
-}
-
-/* === ПРИЛОЖЕНИЕ СНОВ === */
 #dreams-app {
   font-family: var(--font);
   max-width: 1200px;
   margin: 0 auto;
-  padding: calc(var(--space-6) * 2) var(--space-5);
+  padding: var(--space-5);
   box-sizing: border-box;
   position: relative;
   color: var(--color-text);
 }
 
-/* --- Фильтры и сортировка --- */
+#dreams-bottom-bar {
+  font-family: var(--font);
+}
+
+/* --- Общий контейнер фильтров и сортировки --- */
 .dreams-controls {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -120,24 +53,11 @@ body {
   margin-bottom: var(--space-6);
 }
 
-.dreams-filter,
-.dreams-sort {
+/* --- Фильтр --- */
+.dreams-filter {
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
-}
-
-.dreams-filter__label,
-.dreams-sort__label {
-  font-size: var(--fontSize-0);
-  color: var(--color-lightest-grey);
-  white-space: nowrap;
-}
-
-.dreams-filter__label {
-  display: flex;
-  align-items: center;
-  gap: var(--space-1);
 }
 
 .tab-divider {
@@ -146,18 +66,47 @@ body {
   width: 100%;
 }
 
-.dreams-filter__tabs,
+.dreams-filter__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--fontSize-0);
+  color: var(--color-lightest-grey);
+}
+
+.dreams-filter__label .icon {
+  width: 1em;
+  height: 1em;
+}
+
+.dreams-filter__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  position: relative;
+}
+
+/* --- Сортировка --- */
+.dreams-sort {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.dreams-sort__label {
+  font-size: var(--fontSize-0);
+  color: var(--color-lightest-grey);
+  white-space: nowrap;
+}
+
 .dreams-sort__tabs {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-1);
 }
 
-.dreams-filter__tabs {
-  position: relative;
-}
-
-/* --- Табы (общие стили) --- */
+/* --- Общие стили табов (фильтр и сортировка) --- */
 .dreams-filter__tab,
 .dreams-sort__tab {
   border: none;
@@ -236,10 +185,6 @@ body {
   color: var(--color-text);
 }
 
-.dream-card--expanded {
-  box-shadow: 0 0 0 1px var(--color-accent);
-}
-
 .dream-card__title {
   margin: 0 0 var(--space-2);
   font-size: var(--fontSize-3);
@@ -267,7 +212,6 @@ body {
   margin-top: auto;
 }
 
-/* --- Раскрывающиеся детали --- */
 .dream-card__details {
   margin-top: var(--space-4);
   padding-top: var(--space-4);
@@ -290,15 +234,6 @@ body {
   white-space: pre-wrap;
 }
 
-.dream-card__source {
-  font-size: var(--fontSize-1);
-  color: var(--color-lightgrey);
-  margin-bottom: var(--space-3);
-  line-height: 1.5;
-  display: flex;
-  flex-direction: column;
-}
-
 /* --- Унифицированные кнопки READ и LISTEN/PAUSE --- */
 .dream-card__link,
 .dream-card__audio-btn {
@@ -318,19 +253,13 @@ body {
   transition: opacity 0.15s, color 0.15s;
 }
 
-@media (hover: hover) {
-
-  .dream-card__link:hover,
-  .dream-card__audio-btn:hover {
-    color: var(--color-accent);
-  }
+.dream-card__audio-btn .icon,
+.dream-card__link .icon {
+  width: 1rem;
+  height: 1rem;
 }
 
-/* === НИЖНИЙ БАР (плеер + кнопки) === */
-#dreams-bottom-bar {
-  font-family: var(--font);
-}
-
+/* --- Нижний бар (плеер + эмбиент) --- */
 .dreams-bottom-bar {
   position: fixed;
   font-size: var(--fontSize-1);
@@ -340,14 +269,15 @@ body {
   z-index: 998;
   display: flex;
   align-items: center;
+  /* justify-content: space-between; */
   justify-content: flex-end;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
   background: transparent;
   border-radius: var(--radii-1);
-  pointer-events: none;
 }
 
+/* Плеер */
 .dreams-player {
   margin-right: auto;
   display: flex;
@@ -357,7 +287,6 @@ body {
   background: var(--black-color);
   border: 1px solid var(--stroke-dark);
   border-radius: calc(var(--radii-1) / 2);
-  pointer-events: auto;
 }
 
 .player-toggle {
@@ -385,7 +314,17 @@ body {
   flex: 1;
 }
 
-/* --- Кнопки в баре (Ambient и Reset) --- */
+.dream-card__source {
+  font-size: var(--fontSize-1);
+  color: var(--color-lightgrey);
+  margin-bottom: var(--space-3);
+  line-height: 1.5;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* Общие стили для кнопок в баре (Ambient и Reset) */
 .ambient-btn,
 .reset-progress {
   position: static;
@@ -403,7 +342,6 @@ body {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  pointer-events: auto;
 }
 
 .ambient-btn:hover,
@@ -418,15 +356,16 @@ body {
   height: 1.2rem;
 }
 
+/* Уникальное состояние для Ambient (активен) */
 .ambient-btn--on {
   background: var(--shadow-color);
   color: var(--color-lightest-grey);
   border-color: var(--shadow-color);
 }
 
-/* --- Секретный сброс --- */
 .secret-reset {
   position: fixed;
+  /* или absolute, если бар фиксирован */
   bottom: 0;
   left: 0;
   width: 24px;
@@ -436,7 +375,7 @@ body {
   z-index: 9999;
 }
 
-/* --- Диалог подтверждения --- */
+/* Диалог подтверждения */
 .confirm-dialog {
   position: fixed;
   bottom: 80px;
@@ -450,30 +389,27 @@ body {
   text-align: center;
   max-width: calc(100vw - 40px);
   width: 280px;
+  /* Плавное появление */
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s ease, visibility 0.2s;
 }
-
 .confirm-dialog.is-visible {
   opacity: 1;
   visibility: visible;
 }
-
 .confirm-text {
   margin: 0 0 var(--space-3);
   font-size: var(--fontSize-2);
   color: var(--color-text);
 }
-
 .confirm-actions {
   display: flex;
   gap: var(--space-2);
   justify-content: center;
 }
-
 .confirm-btn {
-  padding: var(--space-2) var(--space-4);
+  padding: var(--space-2) var(--space-4); /* побольше для пальцев */
   border: 1px solid var(--stroke-dark);
   border-radius: calc(var(--radii-1) / 2);
   background: var(--dark-grey-color);
@@ -481,33 +417,12 @@ body {
   cursor: pointer;
   font-size: var(--fontSize-1);
 }
-
 .confirm-btn--cancel {
   background: transparent;
   color: var(--color-lightgrey);
 }
 
-/* === АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ И МОБИЛЬНЫХ === */
-@media (max-width: 960px) {
-  .archive-layout {
-    flex-direction: column;
-    padding: 0 var(--space-4);
-  }
-
-  .archive-layout__panel {
-    display: none;
-  }
-
-  #particle-container {
-    height: 350px;
-  }
-
-  .dreams-header__title {
-    font-size: 1.8rem;
-    padding: var(--space-4) 0;
-  }
-}
-
+/* --- Адаптивность --- */
 @media (max-width: 640px) {
   .dreams-controls {
     grid-template-columns: 1fr;
@@ -531,6 +446,7 @@ body {
   .dreams-player {
     flex: 1;
     margin-right: 0;
+    /* убираем desktop-отступ, если он был */
   }
 
   .player-info {
@@ -545,5 +461,27 @@ body {
     transform: translateX(-50%);
     width: auto;
     max-width: 600px;
+  }
+}
+
+.dream-card--expanded {
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.dreams-bottom-bar {
+  pointer-events: none;
+}
+
+.ambient-btn,
+#dreams-player,
+.reset-progress {
+  pointer-events: auto;
+}
+
+@media (hover: hover) {
+
+  .dream-card__link:hover,
+  .dream-card__audio-btn:hover {
+    color: var(--color-accent);
   }
 }

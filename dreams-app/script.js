@@ -1,6 +1,6 @@
 (function () {
     'use strict';
-
+    
     // 0. Bottom bar
     let playerBar, playerToggle, playerInfo, ambientBtn, resetBtn;
 
@@ -50,7 +50,7 @@
         document.body.appendChild(bar);
     }
 
-    createBottomBar();
+    createBottomBar(); 
 
     // 1. Data loading 
 
@@ -82,41 +82,8 @@
         }
 
         buildFilterTabs();
-
-        // Функция установки обработчиков для фильтров и сортировки
-        function initFilterAndSortListeners() {
-            const filterTabs = document.getElementById('filter-tabs');
-            const sortTabs = document.getElementById('sort-tabs');
-
-            if (filterTabs) {
-                filterTabs.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const btn = e.target.closest('.dreams-filter__tab');
-                    if (!btn) return;
-                    document.querySelectorAll('.dreams-filter__tab').forEach(b => b.classList.remove('dreams-filter__tab--active'));
-                    btn.classList.add('dreams-filter__tab--active');
-                    currentFilter = btn.dataset.location;
-                    flipSort(() => applyFiltersAndSort());
-                });
-            }
-
-            if (sortTabs) {
-                sortTabs.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const btn = e.target.closest('.dreams-sort__tab');
-                    if (!btn) return;
-                    document.querySelectorAll('.dreams-sort__tab').forEach(b => b.classList.remove('dreams-sort__tab--active'));
-                    btn.classList.add('dreams-sort__tab--active');
-                    currentSort = btn.dataset.sort;
-                    flipSort(() => applyFiltersAndSort());
-                });
-            }
-        }
-
-
         applyFiltersAndSort();
         updatePlayer();
-         initFilterAndSortListeners();
     }
 
     // 2. Dreams read
@@ -279,7 +246,25 @@
         });
     }
 
+    document.getElementById('filter-tabs').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const btn = e.target.closest('.dreams-filter__tab');
+        if (!btn) return;
+        document.querySelectorAll('.dreams-filter__tab').forEach(b => b.classList.remove('dreams-filter__tab--active'));
+        btn.classList.add('dreams-filter__tab--active');
+        currentFilter = btn.dataset.location;
+        flipSort(() => applyFiltersAndSort());
+    });
 
+    document.getElementById('sort-tabs').addEventListener('click', (e) => {
+        e.stopPropagation();
+        const btn = e.target.closest('.dreams-sort__tab');
+        if (!btn) return;
+        document.querySelectorAll('.dreams-sort__tab').forEach(b => b.classList.remove('dreams-sort__tab--active'));
+        btn.classList.add('dreams-sort__tab--active');
+        currentSort = btn.dataset.sort;
+        flipSort(() => applyFiltersAndSort());
+    });
 
     // 6. card: read checking and card opening
 
