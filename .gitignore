@@ -1,0 +1,36 @@
+# Зависимости (самое главное)
+node_modules/
+jspm_packages/
+web_modules/
+
+# Логи
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Папки сборки и компиляции (если используете Webpack, Vite, Next.js и т.д.)
+dist/
+build/
+.next/
+.nuxt/
+out/
+
+# Секретные файлы и переменные окружения (ключи, пароли)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+*.pem
+
+# Системные файлы и кэш IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.eslintcache
+.stylelintcache
+.prettiercache

@@ -4,50 +4,72 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dreams App Basis</title>
+  <title>Dreams App</title>
 </head>
 
 <body>
-  <div id="dreams-app">
-    <div class="dreams-controls">
-      <div class="dreams-filter">
-        <span class="dreams-filter__label">Chapter of the experience</span>
-        <div class="tab-divider"></div>
-        <div class="dreams-filter__tabs" id="filter-tabs">
-          <!-- табы вставятся динамически -->
+
+  <div class="archive-app">
+    <div class="archive-layout">
+
+      <div class="archive-layout__main">
+
+        <div id="particle-container"></div>
+
+        <header class="dreams-header">
+          <div class="dreams-header__line" aria-hidden="true"></div>
+          <h2 class="dreams-header__title">ARCHIVE OF DREAMS</h2>
+          <div class="dreams-header__line" aria-hidden="true"></div>
+        </header>
+
+
+        <div id="dreams-app">
+          <div class="dreams-controls">
+            <div class="dreams-filter">
+              <span class="dreams-filter__label">Chapter of the experience</span>
+              <div class="tab-divider"></div>
+              <div class="dreams-filter__tabs" id="filter-tabs">
+                <!-- табы вставятся динамически -->
+              </div>
+            </div>
+
+            <div class="dreams-sort">
+              <span class="dreams-sort__label">Order by</span>
+              <div class="tab-divider"></div>
+              <div class="dreams-sort__tabs" id="sort-tabs">
+                <button class="dreams-sort__tab dreams-sort__tab--active" data-sort="id-asc">As Added</button>
+                <button class="dreams-sort__tab" data-sort="year-desc">Recent</button>
+                <button class="dreams-sort__tab" data-sort="year-asc">Timeline</button>
+                <button class="dreams-sort__tab" data-sort="location-asc">A-Z</button>
+                <button class="dreams-sort__tab" data-sort="location-desc">Z-A</button>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="dreams-count">Total dreams: <span id="dreams-count-value">0</span></div>
+
+
+          <div class="dreams-grid" id="dreams-grid"></div>
+
+          <div id="secret-reset" class="secret-reset" title="Reset progress (3)"></div>
+
+          <div id="confirm-dialog" class="confirm-dialog">
+            <p id="confirm-text" class="confirm-text"></p>
+            <div class="confirm-actions">
+              <button id="confirm-yes" class="confirm-btn">Yes</button>
+              <button id="confirm-no" class="confirm-btn confirm-btn--cancel">No</button>
+            </div>
+          </div>
         </div>
+
       </div>
 
-      <div class="dreams-sort">
-        <span class="dreams-sort__label">Order by</span>
-        <div class="tab-divider"></div>
-        <div class="dreams-sort__tabs" id="sort-tabs">
-          <button class="dreams-sort__tab dreams-sort__tab--active" data-sort="id-asc">As Added</button>
-          <button class="dreams-sort__tab" data-sort="year-desc">Recent</button>
-          <button class="dreams-sort__tab" data-sort="year-asc">Timeline</button>
-          <button class="dreams-sort__tab" data-sort="location-asc">A-Z</button>
-          <button class="dreams-sort__tab" data-sort="location-desc">Z-A</button>
-        </div>
-      </div>
+      <aside class="archive-layout__panel" aria-hidden="true"></aside>
+
     </div>
 
-
-    <div class="dreams-count">Total dreams: <span id="dreams-count-value">0</span></div>
-
-
-    <div class="dreams-grid" id="dreams-grid"></div>
-
-    <div id="secret-reset" class="secret-reset" title="Reset progress (3)"></div>
-
-    <div id="confirm-dialog" class="confirm-dialog">
-      <p id="confirm-text" class="confirm-text"></p>
-      <div class="confirm-actions">
-        <button id="confirm-yes" class="confirm-btn">Yes</button>
-        <button id="confirm-no" class="confirm-btn confirm-btn--cancel">No</button>
-      </div>
-    </div>
   </div>
-
 
   <script src="https://cdn.jsdelivr.net/npm/howler@2.2.4/dist/howler.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
@@ -56,6 +78,14 @@
 
   <link rel="stylesheet" href="./style.css">
   <script src="./script.js"></script>
+  <script type="importmap">
+{
+"imports": {
+"three": "https://cdn.jsdelivr.net/npm/three@0.152.0/build/three.module.js"
+}
+}
+</script>
+  <script type="module" src="./particles.js"></script>
 </body>
 
 </html>
