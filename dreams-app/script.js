@@ -15,14 +15,14 @@
     ambientBtn = document.createElement("button");
     ambientBtn.id = "ambient-toggle";
     ambientBtn.className = "ambient-btn";
-    ambientBtn.title = "Фоновый звук";
+    ambientBtn.title = "Ambient sound";
     ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M9 17v-13h10v13"/><path d="M9 8h10"/></svg>`;
 
     // Reset
     resetBtn = document.createElement("button");
     resetBtn.id = "reset-progress";
     resetBtn.className = "reset-progress";
-    resetBtn.title = "Сбросить всё прочитанное";
+    resetBtn.title = "Reset read progress";
     resetBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg><span class="reset-progress__label">Reset</span>`;
 
     // Player
@@ -270,8 +270,8 @@
     <div class="dream-card__content">
       <h3 class="dream-card__title">${escapeHtml(applyTypography(dream.dreamer || "Untitled"))}</h3>
       <p class="dream-card__meta">${escapeHtml(dream.yearDisplay || dream.year)} · ${escapeHtml(dream.place || dream.location)}</p>
+      ${dream.description ? `<p class="dream-card__desc">${escapeHtml(applyTypography(dream.description))}</p>` : ""}
       <div class="dream-card__details" style="display: none;">
-        ${dream.description ? `<p class="dream-card__desc">${escapeHtml(applyTypography(dream.description))}</p>` : ""}
         <div class="dream-card__source"><strong>Source:</strong> ${escapeHtml(applyTypography(dream.source || ""))}</div>
         <div class="dream-card__fulltext">${escapeHtml(applyTypography(dream.fullText || ""))}</div>
       </div>
