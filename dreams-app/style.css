@@ -12,7 +12,7 @@
   --footer-color: #000000;
   --color-accent: #ccc1ea;
 
-  --font: 'Manrope', sans-serif;
+  --font: "Manrope", sans-serif;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -120,13 +120,22 @@ body {
   cursor: pointer;
   white-space: nowrap;
   line-height: 1.4;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s,
+    transform 160ms ease-out;
 }
 
 .dreams-filter__tab:hover,
 .dreams-sort__tab:hover {
   background-color: var(--stroke-dark);
   color: var(--color-grey);
+}
+
+/* press-фидбек: кнопки должны «прожиматься» */
+.dreams-filter__tab:active,
+.dreams-sort__tab:active {
+  transform: scale(0.97);
 }
 
 .dreams-filter__tab--active,
@@ -145,13 +154,14 @@ body {
 .dreams-count {
   margin-bottom: var(--space-4);
   font-size: var(--fontSize-0);
-  color: var(--stroke-middle);
+  color: var(--color-grey); /* #999: контраст на #121212 >= 4.5:1 (AA) */
 }
 
-/* --- Сетка карточек --- */
+/* --- Сетка карточек ---
+   align-items не задан (stretch): карточки в строке одной высоты —
+   description вынесен внутрь сна, разнобоя высот больше нет */
 .dreams-grid {
   display: grid;
-  align-items: start;
   grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
   gap: var(--space-5);
 }
@@ -164,6 +174,9 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  /* верхнее меню Тильды (fixed, ~40px) наслаивается на карточку —
+     при скролле к началу сна заголовок остаётся читаемым */
+  scroll-margin-top: 60px;
   transition: border 0.15s;
 }
 
@@ -250,7 +263,16 @@ body {
   border: none;
   cursor: pointer;
   text-decoration: none;
-  transition: opacity 0.15s, color 0.15s;
+  transition:
+    opacity 0.15s,
+    color 0.15s,
+    transform 160ms ease-out;
+}
+
+/* press-фидбек */
+.dream-card__link:active,
+.dream-card__audio-btn:active {
+  transform: scale(0.97);
 }
 
 .dream-card__audio-btn .icon,
@@ -337,11 +359,21 @@ body {
   box-shadow: none;
   cursor: pointer;
   color: var(--color-text);
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s,
+    transform 160ms ease-out;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: var(--space-1); /* иконка + подпись «Сбросить» */
   flex-shrink: 0;
+}
+
+/* press-фидбек */
+.ambient-btn:active,
+.reset-progress:active {
+  transform: scale(0.97);
 }
 
 .ambient-btn:hover,
@@ -392,7 +424,9 @@ body {
   /* Плавное появление */
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0.2s;
+  transition:
+    opacity 0.2s ease,
+    visibility 0.2s;
 }
 .confirm-dialog.is-visible {
   opacity: 1;
@@ -478,8 +512,14 @@ body {
   pointer-events: auto;
 }
 
-@media (hover: hover) {
+/* Аудио (аудиофон + плеер) пока не в проекте — скрыто; вернуть,
+   когда появится аудио-часть (см. DECISIONS.md, вводные п.7) */
+#ambient-toggle,
+#dreams-player {
+  display: none !important;
+}
 
+@media (hover: hover) {
   .dream-card__link:hover,
   .dream-card__audio-btn:hover {
     color: var(--color-accent);

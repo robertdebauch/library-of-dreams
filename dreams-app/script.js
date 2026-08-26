@@ -1,152 +1,245 @@
 (function () {
-    'use strict';
-    
-    // 0. Bottom bar
-    let playerBar, playerToggle, playerInfo, ambientBtn, resetBtn;
+  "use strict";
 
-    function createBottomBar() {
-        if (!document.body) return;
+  // 0. Bottom bar
+  let playerBar, playerToggle, playerInfo, ambientBtn, resetBtn;
 
-        const bar = document.createElement('div');
-        bar.id = 'dreams-bottom-bar';
-        bar.className = 'dreams-bottom-bar';
+  function createBottomBar() {
+    if (!document.body) return;
 
-        // Ambient
-        ambientBtn = document.createElement('button');
-        ambientBtn.id = 'ambient-toggle';
-        ambientBtn.className = 'ambient-btn';
-        ambientBtn.title = 'Фоновый звук';
-        ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M9 17v-13h10v13"/><path d="M9 8h10"/></svg>`;
+    const bar = document.createElement("div");
+    bar.id = "dreams-bottom-bar";
+    bar.className = "dreams-bottom-bar";
 
-        // Reset
-        resetBtn = document.createElement('button');
-        resetBtn.id = 'reset-progress';
-        resetBtn.className = 'reset-progress';
-        resetBtn.title = 'Сбросить всё прочитанное';
-        resetBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg>`;
+    // Ambient
+    ambientBtn = document.createElement("button");
+    ambientBtn.id = "ambient-toggle";
+    ambientBtn.className = "ambient-btn";
+    ambientBtn.title = "Фоновый звук";
+    ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M9 17v-13h10v13"/><path d="M9 8h10"/></svg>`;
 
-        // Player
-        playerBar = document.createElement('div');
-        playerBar.id = 'dreams-player';
-        playerBar.className = 'dreams-player';
-        playerBar.style.display = 'none';
+    // Reset
+    resetBtn = document.createElement("button");
+    resetBtn.id = "reset-progress";
+    resetBtn.className = "reset-progress";
+    resetBtn.title = "Сбросить всё прочитанное";
+    resetBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg><span class="reset-progress__label">Reset</span>`;
 
-        playerToggle = document.createElement('button');
-        playerToggle.id = 'player-toggle';
-        playerToggle.className = 'player-toggle';
-        playerToggle.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13 -8z"/></svg>`;
+    // Player
+    playerBar = document.createElement("div");
+    playerBar.id = "dreams-player";
+    playerBar.className = "dreams-player";
+    playerBar.style.display = "none";
 
-        playerInfo = document.createElement('span');
-        playerInfo.id = 'player-info';
-        playerInfo.className = 'player-info';
+    playerToggle = document.createElement("button");
+    playerToggle.id = "player-toggle";
+    playerToggle.className = "player-toggle";
+    playerToggle.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4v16l13 -8z"/></svg>`;
 
-        playerBar.appendChild(playerToggle);
-        playerBar.appendChild(playerInfo);
+    playerInfo = document.createElement("span");
+    playerInfo.id = "player-info";
+    playerInfo.className = "player-info";
 
-        bar.appendChild(playerBar);
-        bar.appendChild(resetBtn);
-        bar.appendChild(ambientBtn);
+    playerBar.appendChild(playerToggle);
+    playerBar.appendChild(playerInfo);
 
-        document.body.appendChild(bar);
+    bar.appendChild(playerBar);
+    bar.appendChild(resetBtn);
+    bar.appendChild(ambientBtn);
+
+    document.body.appendChild(bar);
+  }
+
+  createBottomBar();
+
+  // 1. Data loading
+
+  const CSV_URL =
+    "https://docs.google.com/spreadsheets/d/e/2PACX-1vQITS5CstuDRDakSdIX02kOiEMCmoF1Kflh56TQXfdSaoOjJUB50E3D8wwxNnZE8peKrkpXDjgnFMt9/pub?gid=0&single=true&output=csv";
+  let dreams = [];
+
+  async function loadDreams() {
+    try {
+      const response = await fetch(CSV_URL + "&t=" + Date.now());
+      if (!response.ok) throw new Error("Network error");
+      const csvText = await response.text();
+
+      // Используем PapaParse для корректного разбора CSV с кавычками и запятыми
+      const result = Papa.parse(csvText, {
+        header: true, // первая строка — заголовки
+        skipEmptyLines: true,
+        trimHeaders: true,
+        trimValues: true,
+      });
+
+      dreams = result.data
+        .map((row) => ({
+          ...row,
+          id: parseInt(row.id, 10) || 0,
+          year: parseInt(row.year, 10) || 0,
+        }))
+        .filter((d) => d.id > 0);
+    } catch (err) {
+      console.warn("CSV load failed, using local data.js", err);
+      dreams = window.dreamsData || [];
     }
 
-    createBottomBar(); 
+    buildFilterTabs();
+    applyFiltersAndSort();
+    updatePlayer();
+  }
 
-    // 1. Data loading 
+  // 2. Dreams read
 
-    const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQITS5CstuDRDakSdIX02kOiEMCmoF1Kflh56TQXfdSaoOjJUB50E3D8wwxNnZE8peKrkpXDjgnFMt9/pub?gid=0&single=true&output=csv';
-    let dreams = [];
-
-    async function loadDreams() {
-        try {
-            const response = await fetch(CSV_URL + '&t=' + Date.now());
-            if (!response.ok) throw new Error('Network error');
-            const csvText = await response.text();
-
-            // Используем PapaParse для корректного разбора CSV с кавычками и запятыми
-            const result = Papa.parse(csvText, {
-                header: true,           // первая строка — заголовки
-                skipEmptyLines: true,
-                trimHeaders: true,
-                trimValues: true
-            });
-
-            dreams = result.data.map(row => ({
-                ...row,
-                id: parseInt(row.id, 10) || 0,
-                year: parseInt(row.year, 10) || 0
-            })).filter(d => d.id > 0);
-        } catch (err) {
-            console.warn('CSV load failed, using local data.js', err);
-            dreams = window.dreamsData || [];
-        }
-
-        buildFilterTabs();
-        applyFiltersAndSort();
-        updatePlayer();
+  const STORAGE_KEY = "dreams_read";
+  function getReadDreams() {
+    try {
+      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+    } catch (e) {
+      return [];
     }
-
-    // 2. Dreams read
-
-    const STORAGE_KEY = 'dreams_read';
-    function getReadDreams() {
-        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } catch (e) { return []; }
+  }
+  function markAsRead(dreamId) {
+    const read = getReadDreams();
+    if (!read.includes(dreamId)) {
+      read.push(dreamId);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(read));
     }
-    function markAsRead(dreamId) {
-        const read = getReadDreams();
-        if (!read.includes(dreamId)) {
-            read.push(dreamId);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(read));
-        }
-    }
+  }
 
-    // 3. Utils
+  // 3. Utils
 
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
+  function escapeHtml(text) {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
 
-    function applyTypography(text) {
-        if (!text) return text;
-        // Список коротких слов, после которых пробел заменяется на неразрывный
-        const shortWords = [
-            'a', 'an', 'the', 'in', 'on', 'at', 'by', 'for', 'to', 'of', 'with',
-            'and', 'or', 'but', 'nor', 'so', 'yet', 'not', 'from', 'into', 'onto',
-            'upon', 'within', 'without', 'over', 'under', 'above', 'below',
-            'between', 'among', 'through', 'during', 'before', 'after',
-            'behind', 'beside', 'along', 'around', 'down', 'up', 'off', 'out',
-            'is', 'are', 'was', 'were', 'be', 'been', 'being',
-            'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing',
-            'will', 'would', 'shall', 'should', 'may', 'might', 'must', 'can', 'could',
-            'I', 'you', 'he', 'she', 'it', 'we', 'they',
-            'me', 'him', 'her', 'us', 'them',
-            'my', 'your', 'his', 'its', 'our', 'their',
-            'mine', 'yours', 'hers', 'ours', 'theirs',
-            'this', 'that', 'these', 'those',
-            'no', 'not', 'as', 'if', 'or'
-        ];
-        // Ищем короткое слово + пробел (учитываем границы слова, регистр)
-        const regex = new RegExp(`\\b(${shortWords.join('|')})\\s+`, 'gi');
-        return text.replace(regex, (match, p1) => p1 + '\u00A0');
-    }
+  function applyTypography(text) {
+    if (!text) return text;
+    // Список коротких слов, после которых пробел заменяется на неразрывный
+    const shortWords = [
+      "a",
+      "an",
+      "the",
+      "in",
+      "on",
+      "at",
+      "by",
+      "for",
+      "to",
+      "of",
+      "with",
+      "and",
+      "or",
+      "but",
+      "nor",
+      "so",
+      "yet",
+      "not",
+      "from",
+      "into",
+      "onto",
+      "upon",
+      "within",
+      "without",
+      "over",
+      "under",
+      "above",
+      "below",
+      "between",
+      "among",
+      "through",
+      "during",
+      "before",
+      "after",
+      "behind",
+      "beside",
+      "along",
+      "around",
+      "down",
+      "up",
+      "off",
+      "out",
+      "is",
+      "are",
+      "was",
+      "were",
+      "be",
+      "been",
+      "being",
+      "have",
+      "has",
+      "had",
+      "having",
+      "do",
+      "does",
+      "did",
+      "doing",
+      "will",
+      "would",
+      "shall",
+      "should",
+      "may",
+      "might",
+      "must",
+      "can",
+      "could",
+      "I",
+      "you",
+      "he",
+      "she",
+      "it",
+      "we",
+      "they",
+      "me",
+      "him",
+      "her",
+      "us",
+      "them",
+      "my",
+      "your",
+      "his",
+      "its",
+      "our",
+      "their",
+      "mine",
+      "yours",
+      "hers",
+      "ours",
+      "theirs",
+      "this",
+      "that",
+      "these",
+      "those",
+      "no",
+      "not",
+      "as",
+      "if",
+      "or",
+    ];
+    // Ищем короткое слово + пробел (учитываем границы слова, регистр)
+    const regex = new RegExp(`\\b(${shortWords.join("|")})\\s+`, "gi");
+    return text.replace(regex, (match, p1) => p1 + "\u00A0");
+  }
 
-    function getUniqueLocations() {
-        return [...new Set(dreams.map(d => d.location))].sort((a, b) => a.localeCompare(b));
-    }
+  function getUniqueLocations() {
+    return [...new Set(dreams.map((d) => d.location))].sort((a, b) =>
+      a.localeCompare(b),
+    );
+  }
 
+  // 4. Render of Cards
 
-    // 4. Render of Cards
+  const grid = document.getElementById("dreams-grid");
+  const countSpan = document.getElementById("dreams-count-value");
 
-    const grid = document.getElementById('dreams-grid');
-    const countSpan = document.getElementById('dreams-count-value');
-
-    function renderDreams(dreamsArray) {
-        const readIds = getReadDreams();
-        const html = dreamsArray.map(dream => {
-            const isRead = readIds.includes(dream.id);
-            const readHtml = `
+  function renderDreams(dreamsArray) {
+    const readIds = getReadDreams();
+    const html = dreamsArray
+      .map((dream) => {
+        const isRead = readIds.includes(dream.id);
+        const readHtml = `
         <button class="dream-card__link" data-dream-id="${dream.id}" aria-expanded="false">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -159,7 +252,8 @@
           READ
         </button>
       `;
-            const audioHtml = dream.audioUrl ? `
+        const audioHtml = dream.audioUrl
+          ? `
         <button class="dream-card__audio-btn" data-audio="${escapeHtml(dream.audioUrl)}" data-dream-id="${dream.id}">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -169,16 +263,17 @@
           </svg>
           LISTEN
         </button>
-      ` : '';
-            return `
-  <div class="dream-card ${isRead ? 'dream-card--read' : ''}" data-dream-id="${dream.id}">
+      `
+          : "";
+        return `
+  <div class="dream-card ${isRead ? "dream-card--read" : ""}" data-dream-id="${dream.id}">
     <div class="dream-card__content">
-      <h3 class="dream-card__title">${escapeHtml(applyTypography(dream.dreamer || 'Untitled'))}</h3>
+      <h3 class="dream-card__title">${escapeHtml(applyTypography(dream.dreamer || "Untitled"))}</h3>
       <p class="dream-card__meta">${escapeHtml(dream.yearDisplay || dream.year)} · ${escapeHtml(dream.place || dream.location)}</p>
-      ${dream.description ? `<p class="dream-card__desc">${escapeHtml(applyTypography(dream.description))}</p>` : ''}
       <div class="dream-card__details" style="display: none;">
-        <div class="dream-card__source"><strong>Source:</strong> ${escapeHtml(applyTypography(dream.source || ''))}</div>
-        <div class="dream-card__fulltext">${escapeHtml(applyTypography(dream.fullText || ''))}</div>
+        ${dream.description ? `<p class="dream-card__desc">${escapeHtml(applyTypography(dream.description))}</p>` : ""}
+        <div class="dream-card__source"><strong>Source:</strong> ${escapeHtml(applyTypography(dream.source || ""))}</div>
+        <div class="dream-card__fulltext">${escapeHtml(applyTypography(dream.fullText || ""))}</div>
       </div>
     </div>
     <div class="dream-card__actions">
@@ -187,112 +282,149 @@
     </div>
   </div>
 `;
-        }).join('');
-        grid.innerHTML = html;
-        countSpan.textContent = dreamsArray.length;
-        syncAudioButtons();
+      })
+      .join("");
+    grid.innerHTML = html;
+    countSpan.textContent = dreamsArray.length;
+    syncAudioButtons();
+  }
+
+  // 5. Filters, Sort
+
+  let currentFilter = "all";
+  let currentSort = "id-asc";
+
+  function applyFiltersAndSort() {
+    let filtered = [...dreams];
+    if (currentFilter !== "all")
+      filtered = filtered.filter((d) => d.location === currentFilter);
+    switch (currentSort) {
+      case "id-asc":
+        filtered.sort((a, b) => a.id - b.id);
+        break;
+      case "year-desc":
+        filtered.sort((a, b) => b.year - a.year);
+        break;
+      case "year-asc":
+        filtered.sort((a, b) => a.year - b.year);
+        break;
+      case "location-asc":
+        filtered.sort((a, b) => a.location.localeCompare(b.location));
+        break;
+      case "location-desc":
+        filtered.sort((a, b) => b.location.localeCompare(a.location));
+        break;
     }
+    renderDreams(filtered);
+  }
 
-    // 5. Filters, Sort
+  function buildFilterTabs() {
+    const tabsContainer = document.getElementById("filter-tabs");
+    const locations = getUniqueLocations();
+    const allTab = `<button class="dreams-filter__tab dreams-filter__tab--active" data-location="all">All</button>`;
+    const locationTabs = locations
+      .map(
+        (loc) =>
+          `<button class="dreams-filter__tab" data-location="${escapeHtml(loc)}">${escapeHtml(loc)}</button>`,
+      )
+      .join("");
+    tabsContainer.innerHTML = allTab + locationTabs;
+  }
 
-    let currentFilter = 'all';
-    let currentSort = 'id-asc';
-
-    function applyFiltersAndSort() {
-        let filtered = [...dreams];
-        if (currentFilter !== 'all') filtered = filtered.filter(d => d.location === currentFilter);
-        switch (currentSort) {
-            case 'id-asc': filtered.sort((a, b) => a.id - b.id); break;
-            case 'year-desc': filtered.sort((a, b) => b.year - a.year); break;
-            case 'year-asc': filtered.sort((a, b) => a.year - b.year); break;
-            case 'location-asc': filtered.sort((a, b) => a.location.localeCompare(b.location)); break;
-            case 'location-desc': filtered.sort((a, b) => b.location.localeCompare(a.location)); break;
-        }
-        renderDreams(filtered);
+  // FLIP-animaton
+  function flipSort(sortFunction) {
+    // reduced-motion: без анимации, мгновенная перестановка
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      sortFunction();
+      return;
     }
-
-    function buildFilterTabs() {
-        const tabsContainer = document.getElementById('filter-tabs');
-        const locations = getUniqueLocations();
-        const allTab = `<button class="dreams-filter__tab dreams-filter__tab--active" data-location="all">All</button>`;
-        const locationTabs = locations.map(loc => `<button class="dreams-filter__tab" data-location="${escapeHtml(loc)}">${escapeHtml(loc)}</button>`).join('');
-        tabsContainer.innerHTML = allTab + locationTabs;
-    }
-
-    // FLIP-animaton
-    function flipSort(sortFunction) {
-        const oldCards = document.querySelectorAll('.dream-card');
-        const oldPositions = {};
-        oldCards.forEach(card => {
-            const id = card.dataset.dreamId;
-            if (id) oldPositions[id] = card.getBoundingClientRect();
-        });
-        sortFunction();
-        const newCards = document.querySelectorAll('.dream-card');
-        newCards.forEach(card => {
-            const id = card.dataset.dreamId;
-            const oldRect = oldPositions[id];
-            const newRect = card.getBoundingClientRect();
-            if (!oldRect) {
-                gsap.from(card, { opacity: 0, y: 10, duration: 0.3, ease: 'power3.out' });
-                return;
-            }
-            const deltaX = oldRect.left - newRect.left;
-            const deltaY = oldRect.top - newRect.top;
-            if (deltaX !== 0 || deltaY !== 0) {
-                gsap.set(card, { x: deltaX, y: deltaY });
-                gsap.to(card, { x: 0, y: 0, duration: 0.4, ease: 'power3.out' });
-            }
-        });
-    }
-
-    document.getElementById('filter-tabs').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const btn = e.target.closest('.dreams-filter__tab');
-        if (!btn) return;
-        document.querySelectorAll('.dreams-filter__tab').forEach(b => b.classList.remove('dreams-filter__tab--active'));
-        btn.classList.add('dreams-filter__tab--active');
-        currentFilter = btn.dataset.location;
-        flipSort(() => applyFiltersAndSort());
+    const oldCards = document.querySelectorAll(".dream-card");
+    const oldPositions = {};
+    oldCards.forEach((card) => {
+      const id = card.dataset.dreamId;
+      if (id) oldPositions[id] = card.getBoundingClientRect();
     });
-
-    document.getElementById('sort-tabs').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const btn = e.target.closest('.dreams-sort__tab');
-        if (!btn) return;
-        document.querySelectorAll('.dreams-sort__tab').forEach(b => b.classList.remove('dreams-sort__tab--active'));
-        btn.classList.add('dreams-sort__tab--active');
-        currentSort = btn.dataset.sort;
-        flipSort(() => applyFiltersAndSort());
+    sortFunction();
+    const newCards = document.querySelectorAll(".dream-card");
+    newCards.forEach((card) => {
+      const id = card.dataset.dreamId;
+      const oldRect = oldPositions[id];
+      const newRect = card.getBoundingClientRect();
+      if (!oldRect) {
+        gsap.from(card, {
+          opacity: 0,
+          y: 10,
+          duration: 0.3,
+          ease: "power3.out",
+        });
+        return;
+      }
+      const deltaX = oldRect.left - newRect.left;
+      const deltaY = oldRect.top - newRect.top;
+      if (deltaX !== 0 || deltaY !== 0) {
+        gsap.set(card, { x: deltaX, y: deltaY });
+        gsap.to(card, { x: 0, y: 0, duration: 0.4, ease: "power3.out" });
+      }
     });
+  }
 
-    // 6. card: read checking and card opening
+  document.getElementById("filter-tabs").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const btn = e.target.closest(".dreams-filter__tab");
+    if (!btn) return;
+    document
+      .querySelectorAll(".dreams-filter__tab")
+      .forEach((b) => b.classList.remove("dreams-filter__tab--active"));
+    btn.classList.add("dreams-filter__tab--active");
+    currentFilter = btn.dataset.location;
+    flipSort(() => applyFiltersAndSort());
+  });
 
-    grid.addEventListener('click', (event) => {
-        const link = event.target.closest('.dream-card__link');
-        if (!link) return;
+  document.getElementById("sort-tabs").addEventListener("click", (e) => {
+    e.stopPropagation();
+    const btn = e.target.closest(".dreams-sort__tab");
+    if (!btn) return;
+    document
+      .querySelectorAll(".dreams-sort__tab")
+      .forEach((b) => b.classList.remove("dreams-sort__tab--active"));
+    btn.classList.add("dreams-sort__tab--active");
+    currentSort = btn.dataset.sort;
+    flipSort(() => applyFiltersAndSort());
+  });
 
-        const dreamId = parseInt(link.dataset.dreamId, 10);
-        if (isNaN(dreamId)) return;
+  // 6. card: read checking and card opening
 
-        const card = link.closest('.dream-card');
-        if (!card) return;
+  grid.addEventListener("click", (event) => {
+    const link = event.target.closest(".dream-card__link");
+    if (!link) return;
 
-        const details = card.querySelector('.dream-card__details');
-        if (!details) return;
+    const dreamId = parseInt(link.dataset.dreamId, 10);
+    if (isNaN(dreamId)) return;
 
-        const isHidden = details.style.display === 'none';
+    const card = link.closest(".dream-card");
+    if (!card) return;
 
-        if (isHidden) {
-            // Закрываем все остальные открытые карточки
-            document.querySelectorAll('.dream-card__details[style*="display: block"]').forEach(otherDetails => {
-                if (otherDetails !== details) {
-                    otherDetails.style.display = 'none';
-                    otherDetails.closest('.dream-card').classList.remove('dream-card--expanded');
-                    const otherLink = otherDetails.closest('.dream-card').querySelector('.dream-card__link');
-                    if (otherLink) {
-                        otherLink.setAttribute('aria-expanded', 'false');
-                        otherLink.innerHTML = `
+    const details = card.querySelector(".dream-card__details");
+    if (!details) return;
+
+    const isHidden = details.style.display === "none";
+
+    if (isHidden) {
+      // Закрываем все остальные открытые карточки
+      document
+        .querySelectorAll('.dream-card__details[style*="display: block"]')
+        .forEach((otherDetails) => {
+          if (otherDetails !== details) {
+            otherDetails.style.display = "none";
+            otherDetails
+              .closest(".dream-card")
+              .classList.remove("dream-card--expanded");
+            const otherLink = otherDetails
+              .closest(".dream-card")
+              .querySelector(".dream-card__link");
+            if (otherLink) {
+              otherLink.setAttribute("aria-expanded", "false");
+              otherLink.innerHTML = `
                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
                           <path stroke="none" d="M0 0h24v24H0z" fill="none" />
                           <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
@@ -302,36 +434,36 @@
                           <path d="M21 6l0 13" />
                         </svg>
                         READ`;
-                        otherLink.blur();
-                    }
-                }
-            });
-
-            // Временно убираем затемнение, если карточка уже прочитана
-            const wasRead = card.classList.contains('dream-card--read');
-            if (wasRead) {
-                card.classList.remove('dream-card--read');
+              otherLink.blur();
             }
+          }
+        });
 
-            // Открываем текущую
-            details.style.display = 'block';
-            link.setAttribute('aria-expanded', 'true');
-            link.innerHTML = `
+      // Временно убираем затемнение, если карточка уже прочитана
+      const wasRead = card.classList.contains("dream-card--read");
+      if (wasRead) {
+        card.classList.remove("dream-card--read");
+      }
+
+      // Открываем текущую
+      details.style.display = "block";
+      link.setAttribute("aria-expanded", "true");
+      link.innerHTML = `
             <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
               <path d="M18 6l-12 12" /><path d="M6 6l12 12" />
             </svg> CLOSE`;
-            link.blur();
+      link.blur();
 
-            // Добавляем класс expanded (один раз)
-            card.classList.add('dream-card--expanded');
+      // Добавляем класс expanded (один раз)
+      card.classList.add("dream-card--expanded");
 
-            // Сохраняем флаг, чтобы при закрытии знать, было ли прочитано
-            card.dataset.wasRead = wasRead ? '1' : '0';
-        } else {
-            // Закрываем текущую
-            details.style.display = 'none';
-            link.setAttribute('aria-expanded', 'false');
-            link.innerHTML = `
+      // Сохраняем флаг, чтобы при закрытии знать, было ли прочитано
+      card.dataset.wasRead = wasRead ? "1" : "0";
+    } else {
+      // Закрываем текущую
+      details.style.display = "none";
+      link.setAttribute("aria-expanded", "false");
+      link.innerHTML = `
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
               <path stroke="none" d="M0 0h24v24H0z" fill="none" />
               <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
@@ -340,54 +472,56 @@
               <path d="M12 6l0 13" />
               <path d="M21 6l0 13" />
             </svg> READ`;
-            link.blur();
+      link.blur();
 
-            // Убираем expanded
-            card.classList.remove('dream-card--expanded');
+      // Убираем expanded
+      card.classList.remove("dream-card--expanded");
 
-            // Отмечаем прочитанным, если ещё не было
-            markAsRead(dreamId);
-            card.classList.add('dream-card--read');
+      // Отмечаем прочитанным, если ещё не было
+      markAsRead(dreamId);
+      card.classList.add("dream-card--read");
 
-            // Если перед открытием карточка была прочитана, то класс уже должен быть,
-            // но на всякий случай добавили (markAsRead и add).
-            // Можно убрать data-атрибут
-            delete card.dataset.wasRead;
+      // Если перед открытием карточка была прочитана, то класс уже должен быть,
+      // но на всякий случай добавили (markAsRead и add).
+      // Можно убрать data-атрибут
+      delete card.dataset.wasRead;
 
-            // Возвращаемся к карточке
-            setTimeout(() => {
-                card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 50);
-        }
-    });
+      // Возвращаемся к карточке
+      setTimeout(() => {
+        card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }, 50);
+    }
+  });
 
-    // 7. Audio & Player
+  // 7. Audio & Player
 
-    const ambient = new Howl({
-        src: ['https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/ambient.wav'],
-        loop: true,
-        volume: 0,
-        preload: true
-    });
-    let ambientOn = false;
+  const ambient = new Howl({
+    src: [
+      "https://cdn.jsdelivr.net/gh/robertdebauch/library-of-dreams/audio/ambient.wav",
+    ],
+    loop: true,
+    volume: 0,
+    preload: true,
+  });
+  let ambientOn = false;
 
-    let voiceHowl = null;
-    let voiceDreamId = null;
-    let voicePlaying = false;
+  let voiceHowl = null;
+  let voiceDreamId = null;
+  let voicePlaying = false;
 
-    function syncAudioButtons() {
-        document.querySelectorAll('.dream-card__audio-btn').forEach(btn => {
-            const btnDreamId = parseInt(btn.dataset.dreamId, 10);
-            if (voiceHowl && voiceDreamId === btnDreamId && voicePlaying) {
-                btn.innerHTML = `
+  function syncAudioButtons() {
+    document.querySelectorAll(".dream-card__audio-btn").forEach((btn) => {
+      const btnDreamId = parseInt(btn.dataset.dreamId, 10);
+      if (voiceHowl && voiceDreamId === btnDreamId && voicePlaying) {
+        btn.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
             <path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
             <path d="M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
           </svg>
           PAUSE
         `;
-            } else {
-                btn.innerHTML = `
+      } else {
+        btn.innerHTML = `
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="icon">
             <path stroke="none" d="M0 0h24v24H0z" fill="none" />
             <path d="M4 15a2 2 0 0 1 2 -2h1a2 2 0 0 1 2 2v3a2 2 0 0 1 -2 2h-1a2 2 0 0 1 -2 -2l0 -3" />
@@ -396,204 +530,235 @@
           </svg>
           LISTEN
         `;
-            }
-        });
-    }
+      }
+    });
+  }
 
-    if (playerToggle) {
-        playerToggle.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (!voiceHowl) return;
-            if (voicePlaying) {
-                voiceHowl.pause();
-            } else {
-                voiceHowl.play();
-            }
-        });
-    }
+  if (playerToggle) {
+    playerToggle.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (!voiceHowl) return;
+      if (voicePlaying) {
+        voiceHowl.pause();
+      } else {
+        voiceHowl.play();
+      }
+    });
+  }
 
-    if (ambientBtn) {
-        ambientBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            if (!ambientOn) {
-                ambient.volume(1.0);
-                ambient.play();
-                ambientBtn.classList.add('ambient-btn--on');
-                ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  if (ambientBtn) {
+    ambientBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      if (!ambientOn) {
+        ambient.volume(1.0);
+        ambient.play();
+        ambientBtn.classList.add("ambient-btn--on");
+        ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
         <path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />
         <path d="M9 17v-13h10v13" />
         <path d="M9 8h10" />
       </svg>`;
-                ambientOn = true;
-            } else {
-                ambient.pause();
-                ambient.volume(0);
-                ambientBtn.classList.remove('ambient-btn--on');
-                ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        ambientOn = true;
+      } else {
+        ambient.pause();
+        ambient.volume(0);
+        ambientBtn.classList.remove("ambient-btn--on");
+        ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
         <path d="M6 17m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" />
         <path d="M14.42 14.45a3 3 0 1 0 4.138 4.119" />
         <path d="M9 17v-8m0 -4v-1h10v11" />
         <path d="M12 8h7" />
         <path d="M3 3l18 18" />
       </svg>`;
-                ambientOn = false;
-            }
-        });
-    }
+        ambientOn = false;
+      }
+    });
+  }
 
-    // const resetBtn = document.getElementById('reset-progress');
-    const confirmDialog = document.getElementById('confirm-dialog');
-    const confirmText = document.getElementById('confirm-text');
-    const confirmYes = document.getElementById('confirm-yes');
-    const confirmNo = document.getElementById('confirm-no');
+  // const resetBtn = document.getElementById('reset-progress');
+  const confirmDialog = document.getElementById("confirm-dialog");
+  const confirmText = document.getElementById("confirm-text");
+  const confirmYes = document.getElementById("confirm-yes");
+  const confirmNo = document.getElementById("confirm-no");
 
-    // Функция для показа диалога
-    function showConfirmDialog() {
-        console.log('showConfirmDialog called', confirmDialog);
-        if (!confirmDialog) return;
-        confirmText.textContent = 'Clear all read progress?'; // ← вот это
-        confirmDialog.classList.add('is-visible');
-    }
+  // Функция для показа диалога
+  function showConfirmDialog() {
+    console.log("showConfirmDialog called", confirmDialog);
+    if (!confirmDialog) return;
+    confirmText.textContent = "Clear all read progress?"; // ← вот это
+    confirmDialog.classList.add("is-visible");
+  }
 
-    // Функция для скрытия диалога
-    function hideConfirmDialog() {
-        if (!confirmDialog) return;
-        confirmDialog.classList.remove('is-visible');
-    }
+  // Функция для скрытия диалога
+  function hideConfirmDialog() {
+    if (!confirmDialog) return;
+    confirmDialog.classList.remove("is-visible");
+  }
 
-    if (resetBtn && confirmDialog) {
-        resetBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            showConfirmDialog();
-        });
+  if (resetBtn && confirmDialog) {
+    resetBtn.addEventListener("click", (event) => {
+      event.stopPropagation();
+      showConfirmDialog();
+    });
 
-        confirmYes.addEventListener('click', () => {
-            localStorage.removeItem(STORAGE_KEY);
-            hideConfirmDialog();
-            applyFiltersAndSort();   // мягко перерисовываем все карточки
-        });
+    confirmYes.addEventListener("click", () => {
+      localStorage.removeItem(STORAGE_KEY);
+      hideConfirmDialog();
+      applyFiltersAndSort(); // мягко перерисовываем все карточки
+    });
 
-        confirmNo.addEventListener('click', () => {
-            hideConfirmDialog();
-        });
+    confirmNo.addEventListener("click", () => {
+      hideConfirmDialog();
+    });
 
-        // Закрытие по клику на фон (сам диалог)
-        confirmDialog.addEventListener('click', (e) => {
-            if (e.target === confirmDialog) {
-                hideConfirmDialog();
-            }
-        });
+    // Закрытие по клику на фон (сам диалог)
+    confirmDialog.addEventListener("click", (e) => {
+      if (e.target === confirmDialog) {
+        hideConfirmDialog();
+      }
+    });
 
-        // Закрытие по клику в любом месте вне диалога
-        document.addEventListener('click', (e) => {
-            if (!confirmDialog.classList.contains('is-visible')) return;
-            // Если клик вне диалога и не по кнопке сброса
-            if (!confirmDialog.contains(e.target) && e.target !== resetBtn) {
-                hideConfirmDialog();
-            }
-        });
-    }
+    // Закрытие по клику в любом месте вне диалога
+    document.addEventListener("click", (e) => {
+      if (!confirmDialog.classList.contains("is-visible")) return;
+      // Если клик вне диалога и не по кнопке сброса
+      if (!confirmDialog.contains(e.target) && e.target !== resetBtn) {
+        hideConfirmDialog();
+      }
+    });
+  }
 
-    function updatePlayer() {
-        if (!playerBar) return;
-        if (voiceHowl) {
-            playerBar.style.display = 'flex';
-            const dream = dreams.find(d => d.id === voiceDreamId);
-            playerInfo.textContent = dream ? `${dream.dreamer || 'Untitled'} · ${dream.yearDisplay || dream.year}` : 'In Focus';
-            playerToggle.innerHTML = voicePlaying ?
-                `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  function updatePlayer() {
+    if (!playerBar) return;
+    if (voiceHowl) {
+      playerBar.style.display = "flex";
+      const dream = dreams.find((d) => d.id === voiceDreamId);
+      playerInfo.textContent = dream
+        ? `${dream.dreamer || "Untitled"} · ${dream.yearDisplay || dream.year}`
+        : "In Focus";
+      playerToggle.innerHTML = voicePlaying
+        ? `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
          <path d="M6 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
          <path d="M14 5m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
-       </svg>` :
-                `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+       </svg>`
+        : `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
          <path d="M7 4v16l13 -8z" />
        </svg>`;
-        } else {
-            playerBar.style.display = 'none';
-        }
+    } else {
+      playerBar.style.display = "none";
     }
+  }
 
-    const originalSync = syncAudioButtons;
-    syncAudioButtons = function () {
-        originalSync();
-        updatePlayer();
-    };
+  const originalSync = syncAudioButtons;
+  syncAudioButtons = function () {
+    originalSync();
+    updatePlayer();
+  };
 
-    grid.addEventListener('click', (e) => {
-        const btn = e.target.closest('.dream-card__audio-btn');
-        if (!btn) return;
-        e.stopPropagation();
+  grid.addEventListener("click", (e) => {
+    const btn = e.target.closest(".dream-card__audio-btn");
+    if (!btn) return;
+    e.stopPropagation();
 
-        const url = btn.dataset.audio;
-        const dreamId = parseInt(btn.dataset.dreamId, 10);
-        if (!url || isNaN(dreamId)) return;
+    const url = btn.dataset.audio;
+    const dreamId = parseInt(btn.dataset.dreamId, 10);
+    if (!url || isNaN(dreamId)) return;
 
-        if (voiceHowl && voiceDreamId === dreamId) {
-            if (voicePlaying) {
-                voiceHowl.pause();
-                voicePlaying = false;
-            } else {
-                voiceHowl.play();
-                voicePlaying = true;
-            }
-            syncAudioButtons();
-            return;
-        }
-
-        if (voiceHowl) {
-            voiceHowl.stop();
-            voiceHowl.unload();
-            voiceHowl = null;
-            voiceDreamId = null;
-            voicePlaying = false;
-        }
-
-        voiceHowl = new Howl({
-            src: [url],
-            preload: true,
-            onplay: function () {
-                voicePlaying = true;
-                syncAudioButtons();
-            },
-            onpause: function () { voicePlaying = false; syncAudioButtons(); },
-            onstop: function () { voicePlaying = false; syncAudioButtons(); },
-            onend: function () {
-                voicePlaying = false;
-                voiceDreamId = null;
-                voiceHowl = null;
-                syncAudioButtons();
-            },
-        });
-        voiceDreamId = dreamId;
+    if (voiceHowl && voiceDreamId === dreamId) {
+      if (voicePlaying) {
+        voiceHowl.pause();
+        voicePlaying = false;
+      } else {
         voiceHowl.play();
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.ctrlKey && e.shiftKey && e.key === 'D') {
-            e.preventDefault();
-            localStorage.removeItem(STORAGE_KEY);
-            location.reload();
-        }
-    });
-
-    const secretReset = document.getElementById('secret-reset');
-    if (secretReset) {
-        let clickCount = 0;
-        let clickTimer = null;
-        secretReset.addEventListener('click', (event) => {
-            event.stopPropagation();
-            clickCount++;
-            if (clickCount >= 3) {
-                localStorage.removeItem(STORAGE_KEY);
-                location.reload();
-            }
-            clearTimeout(clickTimer);
-            clickTimer = setTimeout(() => { clickCount = 0; }, 800);
-        });
+        voicePlaying = true;
+      }
+      syncAudioButtons();
+      return;
     }
 
-    // 8. Start
+    if (voiceHowl) {
+      voiceHowl.stop();
+      voiceHowl.unload();
+      voiceHowl = null;
+      voiceDreamId = null;
+      voicePlaying = false;
+    }
 
-    loadDreams();
+    voiceHowl = new Howl({
+      src: [url],
+      preload: true,
+      onplay: function () {
+        voicePlaying = true;
+        syncAudioButtons();
+      },
+      onpause: function () {
+        voicePlaying = false;
+        syncAudioButtons();
+      },
+      onstop: function () {
+        voicePlaying = false;
+        syncAudioButtons();
+      },
+      onend: function () {
+        voicePlaying = false;
+        voiceDreamId = null;
+        voiceHowl = null;
+        syncAudioButtons();
+      },
+    });
+    voiceDreamId = dreamId;
+    voiceHowl.play();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.ctrlKey && e.shiftKey && e.key === "D") {
+      e.preventDefault();
+      localStorage.removeItem(STORAGE_KEY);
+      location.reload();
+    }
+  });
+
+  const secretReset = document.getElementById("secret-reset");
+  if (secretReset) {
+    let clickCount = 0;
+    let clickTimer = null;
+    secretReset.addEventListener("click", (event) => {
+      event.stopPropagation();
+      clickCount++;
+      if (clickCount >= 3) {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      }
+      clearTimeout(clickTimer);
+      clickTimer = setTimeout(() => {
+        clickCount = 0;
+      }, 800);
+    });
+  }
+
+  // 7.5 Height adapter (Tilda zero-block)
+  // Артборду в макете задана фиксированная высота; контент растёт при
+  // загрузке CSV и при раскрытии карточек — синхронизируем высоту.
+  // ВАЖНО: скролл-докрут при открытии УБРАН (7 итераций, на реальных
+  // устройствах даёт скачки — layout Тильды дёргается). Решение — сборка
+  // блока в t123 (см. ROADMAP/DECISIONS проекта).
+  const dreamsApp = document.getElementById("dreams-app");
+  const artboard = dreamsApp ? dreamsApp.closest(".t396__artboard") : null;
+  if (dreamsApp && artboard && window.ResizeObserver) {
+    const syncHeight = () => {
+      const cs = window.getComputedStyle(artboard);
+      const padTop = parseFloat(cs.paddingTop) || 0;
+      const padBottom = parseFloat(cs.paddingBottom) || 0;
+      artboard.style.height =
+        dreamsApp.offsetHeight + padTop + padBottom + "px";
+    };
+    syncHeight();
+    new ResizeObserver(syncHeight).observe(dreamsApp);
+    window.addEventListener("load", () => setTimeout(syncHeight, 100));
+  }
+
+  // 8. Start
+
+  loadDreams();
 })();
