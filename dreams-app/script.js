@@ -459,6 +459,30 @@
 
       // Сохраняем флаг, чтобы при закрытии знать, было ли прочитано
       card.dataset.wasRead = wasRead ? "1" : "0";
+
+      // Докрут к началу сна при открытии (умный режим).
+      // Скроллим ТОЛЬКО если НАЧАЛО карточки вне «зоны чтения»: уехало под
+      // верхнее меню (top < 60) или стоит в нижней части экрана
+      // (top > 60% высоты). Если заголовок уже в зоне чтения — не дёргаем.
+      // scroll-margin-top: 60px на .dream-card учитывается scrollIntoView.
+      // ИСТОРИЯ: в zero-блоке Тильды «всегда-докрут» давал скачки (7 итераций,
+      // layout дёргался) и был убран; умный режим проверен в standalone-демо
+      // (чистое окружение) — тестируем на Тильде. setTimeout 80мс переживает
+      // пересчёт адаптера высоты (ResizeObserver → artboard.style.height).
+      setTimeout(() => {
+        const rect = card.getBoundingClientRect();
+        const topLimit = 60; // под верхним меню
+        const readZoneBottom = window.innerHeight * 0.6; // низ зоны чтения
+        if (rect.top < topLimit || rect.top > readZoneBottom) {
+          const reduce = window.matchMedia(
+            "(prefers-reduced-motion: reduce)",
+          ).matches;
+          card.scrollIntoView({
+            behavior: reduce ? "auto" : "smooth",
+            block: "start",
+          });
+        }
+      }, 80);
     } else {
       // Закрываем текущую
       details.style.display = "none";
@@ -740,9 +764,9 @@
   // 7.5 Height adapter (Tilda zero-block)
   // Артборду в макете задана фиксированная высота; контент растёт при
   // загрузке CSV и при раскрытии карточек — синхронизируем высоту.
-  // ВАЖНО: скролл-докрут при открытии УБРАН (7 итераций, на реальных
-  // устройствах даёт скачки — layout Тильды дёргается). Решение — сборка
-  // блока в t123 (см. ROADMAP/DECISIONS проекта).
+  // Докрут при открытии ВЕРНУЛСЯ в умном режиме (см. секцию 6): «всегда-
+  // докрут» давал скачки (7 итераций), умный — скроллит только когда
+  // начало карточки вне зоны чтения. Тестируем на Тильде.
   const dreamsApp = document.getElementById("dreams-app");
   const artboard = dreamsApp ? dreamsApp.closest(".t396__artboard") : null;
   if (dreamsApp && artboard && window.ResizeObserver) {

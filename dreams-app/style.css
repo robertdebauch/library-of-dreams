@@ -11,6 +11,8 @@
   --shadow-color: #080808;
   --footer-color: #000000;
   --color-accent: #ccc1ea;
+  /* текст сна: тёплый светло-серый (не мёртвый #cacaca, не резкий #fff) */
+  --color-dream-text: #e7e4e4;
 
   --font: "Manrope", sans-serif;
   --space-1: 4px;
@@ -244,7 +246,7 @@ body {
   text-wrap: pretty;
   font-size: var(--fontSize-2);
   margin-bottom: var(--fontSize-2);
-  color: var(--color-text);
+  color: var(--color-dream-text);
   line-height: 1.6;
   white-space: pre-wrap;
 }
