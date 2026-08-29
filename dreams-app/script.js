@@ -52,6 +52,26 @@
 
   createBottomBar();
 
+  // Панель (Reset и т.д.) видна только когда архив в зоне видимости:
+  // пока пользователь не докрутил до снов (hero/описание) — бар скрыт.
+  (function initBarVisibility() {
+    const bar = document.getElementById("dreams-bottom-bar");
+    const app = document.getElementById("dreams-app");
+    if (!bar || !app || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          bar.classList.toggle(
+            "dreams-bottom-bar--hidden",
+            !entry.isIntersecting,
+          );
+        });
+      },
+      { threshold: 0.05 },
+    );
+    io.observe(app);
+  })();
+
   // 1. Data loading
 
   const CSV_URL =
@@ -223,6 +243,25 @@
     return text.replace(regex, (match, p1) => p1 + "\u00A0");
   }
 
+  // Абзацы: переносы строк из CSV превращаем в <p> с вертикальным отступом.
+  // Иначе HTML схлопывает \n в пробелы (текст сливается), а pre-wrap даёт
+  // только перенос без воздуха — Роберту нужны нормальные разделения.
+  function formatParagraphs(text) {
+    if (!text) return "";
+    return applyTypography(escapeHtml(text))
+      .split(/\r?\n/)
+      .map(function (line) {
+        return line.trim();
+      })
+      .filter(function (line) {
+        return line.length > 0;
+      })
+      .map(function (p) {
+        return "<p>" + p + "</p>";
+      })
+      .join("");
+  }
+
   function getUniqueLocations() {
     return [...new Set(dreams.map((d) => d.location))].sort((a, b) =>
       a.localeCompare(b),
@@ -273,7 +312,7 @@
       ${dream.description ? `<p class="dream-card__desc">${escapeHtml(applyTypography(dream.description))}</p>` : ""}
       <div class="dream-card__details" style="display: none;">
         <div class="dream-card__source"><strong>Source:</strong> ${escapeHtml(applyTypography(dream.source || ""))}</div>
-        <div class="dream-card__fulltext">${escapeHtml(applyTypography(dream.fullText || ""))}</div>
+        <div class="dream-card__fulltext">${formatParagraphs(dream.fullText || "")}</div>
       </div>
     </div>
     <div class="dream-card__actions">

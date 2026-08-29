@@ -220,6 +220,9 @@ body {
   font-size: var(--fontSize-1);
   line-height: 1.5;
   color: var(--color-lightgrey);
+  /* переносы строк из CSV (абзацы в description) — сохраняем,
+     как в .dream-card__fulltext (иначе HTML схлопывает \n в пробелы) */
+  white-space: pre-wrap;
 }
 
 .dream-card__actions {
@@ -248,7 +251,14 @@ body {
   margin-bottom: var(--fontSize-2);
   color: var(--color-dream-text);
   line-height: 1.6;
-  white-space: pre-wrap;
+}
+/* Абзацы текста сна: JS превращает переносы строк в <p>,
+   здесь — вертикальный воздух между абзацами */
+.dream-card__fulltext p {
+  margin: 0 0 1em;
+}
+.dream-card__fulltext p:last-child {
+  margin-bottom: 0;
 }
 
 /* --- Унифицированные кнопки READ и LISTEN/PAUSE --- */
@@ -528,4 +538,20 @@ body {
   .dream-card__audio-btn:hover {
     color: var(--color-accent);
   }
+}
+
+/* Панель (Reset и т.д.) показывается только когда архив в зоне видимости:
+   класс вешается script.js (IntersectionObserver на #dreams-app) —
+   в hero/описании панель не видна. */
+.dreams-bottom-bar {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.25s ease,
+    visibility 0.25s ease;
+}
+.dreams-bottom-bar--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
