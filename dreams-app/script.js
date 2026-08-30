@@ -11,21 +11,18 @@
     bar.id = "dreams-bottom-bar";
     bar.className = "dreams-bottom-bar";
 
-    // Ambient
     ambientBtn = document.createElement("button");
     ambientBtn.id = "ambient-toggle";
     ambientBtn.className = "ambient-btn";
     ambientBtn.title = "Ambient sound";
     ambientBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M13 17a3 3 0 1 0 6 0a3 3 0 0 0 -6 0"/><path d="M9 17v-13h10v13"/><path d="M9 8h10"/></svg>`;
 
-    // Reset
     resetBtn = document.createElement("button");
     resetBtn.id = "reset-progress";
     resetBtn.className = "reset-progress";
     resetBtn.title = "Reset read progress";
     resetBtn.innerHTML = `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4"/><path d="M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4"/></svg><span class="reset-progress__label">Reset</span>`;
 
-    // Player
     playerBar = document.createElement("div");
     playerBar.id = "dreams-player";
     playerBar.className = "dreams-player";
@@ -52,8 +49,6 @@
 
   createBottomBar();
 
-  // Панель (Reset и т.д.) видна только когда архив в зоне видимости:
-  // пока пользователь не докрутил до снов (hero/описание) — бар скрыт.
   (function initBarVisibility() {
     const bar = document.getElementById("dreams-bottom-bar");
     const app = document.getElementById("dreams-app");
@@ -84,9 +79,8 @@
       if (!response.ok) throw new Error("Network error");
       const csvText = await response.text();
 
-      // Используем PapaParse для корректного разбора CSV с кавычками и запятыми
       const result = Papa.parse(csvText, {
-        header: true, // первая строка — заголовки
+        header: true,
         skipEmptyLines: true,
         trimHeaders: true,
         trimValues: true,
@@ -137,7 +131,6 @@
 
   function applyTypography(text) {
     if (!text) return text;
-    // Список коротких слов, после которых пробел заменяется на неразрывный
     const shortWords = [
       "a",
       "an",
@@ -238,14 +231,10 @@
       "if",
       "or",
     ];
-    // Ищем короткое слово + пробел (учитываем границы слова, регистр)
     const regex = new RegExp(`\\b(${shortWords.join("|")})\\s+`, "gi");
     return text.replace(regex, (match, p1) => p1 + "\u00A0");
   }
 
-  // Абзацы: переносы строк из CSV превращаем в <p> с вертикальным отступом.
-  // Иначе HTML схлопывает \n в пробелы (текст сливается), а pre-wrap даёт
-  // только перенос без воздуха — Роберту нужны нормальные разделения.
   function formatParagraphs(text) {
     if (!text) return "";
     return applyTypography(escapeHtml(text))
@@ -262,10 +251,20 @@
       .join("");
   }
 
+  // Порядок глав в фильтре — фиксированный: Room, Journey, Mirror, Lake.
+  // Неизвестные главы — в конец (по алфавиту).
+  const CHAPTER_ORDER = ["Room", "Journey", "Mirror", "Lake"];
+
   function getUniqueLocations() {
-    return [...new Set(dreams.map((d) => d.location))].sort((a, b) =>
-      a.localeCompare(b),
-    );
+    const set = new Set(dreams.map((d) => d.location));
+    return [...set].sort((a, b) => {
+      const ia = CHAPTER_ORDER.indexOf(a);
+      const ib = CHAPTER_ORDER.indexOf(b);
+      if (ia !== -1 && ib !== -1) return ia - ib;
+      if (ia !== -1) return -1;
+      if (ib !== -1) return 1;
+      return a.localeCompare(b);
+    });
   }
 
   // 4. Render of Cards
@@ -370,9 +369,7 @@
     tabsContainer.innerHTML = allTab + locationTabs;
   }
 
-  // FLIP-animaton
   function flipSort(sortFunction) {
-    // reduced-motion: без анимации, мгновенная перестановка
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       sortFunction();
       return;
@@ -431,7 +428,7 @@
     flipSort(() => applyFiltersAndSort());
   });
 
-  // 6. card: read checking and card opening
+  // 6. Card: read and expand
 
   grid.addEventListener("click", (event) => {
     const link = event.target.closest(".dream-card__link");
@@ -449,7 +446,6 @@
     const isHidden = details.style.display === "none";
 
     if (isHidden) {
-      // Закрываем все остальные открытые карточки
       document
         .querySelectorAll('.dream-card__details[style*="display: block"]')
         .forEach((otherDetails) => {
@@ -478,13 +474,11 @@
           }
         });
 
-      // Временно убираем затемнение, если карточка уже прочитана
       const wasRead = card.classList.contains("dream-card--read");
       if (wasRead) {
         card.classList.remove("dream-card--read");
       }
 
-      // Открываем текущую
       details.style.display = "block";
       link.setAttribute("aria-expanded", "true");
       link.innerHTML = `
@@ -493,25 +487,14 @@
             </svg> CLOSE`;
       link.blur();
 
-      // Добавляем класс expanded (один раз)
       card.classList.add("dream-card--expanded");
 
-      // Сохраняем флаг, чтобы при закрытии знать, было ли прочитано
       card.dataset.wasRead = wasRead ? "1" : "0";
 
-      // Докрут к началу сна при открытии (умный режим).
-      // Скроллим ТОЛЬКО если НАЧАЛО карточки вне «зоны чтения»: уехало под
-      // верхнее меню (top < 60) или стоит в нижней части экрана
-      // (top > 60% высоты). Если заголовок уже в зоне чтения — не дёргаем.
-      // scroll-margin-top: 60px на .dream-card учитывается scrollIntoView.
-      // ИСТОРИЯ: в zero-блоке Тильды «всегда-докрут» давал скачки (7 итераций,
-      // layout дёргался) и был убран; умный режим проверен в standalone-демо
-      // (чистое окружение) — тестируем на Тильде. setTimeout 80мс переживает
-      // пересчёт адаптера высоты (ResizeObserver → artboard.style.height).
       setTimeout(() => {
         const rect = card.getBoundingClientRect();
-        const topLimit = 60; // под верхним меню
-        const readZoneBottom = window.innerHeight * 0.6; // низ зоны чтения
+        const topLimit = 60;
+        const readZoneBottom = window.innerHeight * 0.6;
         if (rect.top < topLimit || rect.top > readZoneBottom) {
           const reduce = window.matchMedia(
             "(prefers-reduced-motion: reduce)",
@@ -523,7 +506,6 @@
         }
       }, 80);
     } else {
-      // Закрываем текущую
       details.style.display = "none";
       link.setAttribute("aria-expanded", "false");
       link.innerHTML = `
@@ -537,19 +519,13 @@
             </svg> READ`;
       link.blur();
 
-      // Убираем expanded
       card.classList.remove("dream-card--expanded");
 
-      // Отмечаем прочитанным, если ещё не было
       markAsRead(dreamId);
       card.classList.add("dream-card--read");
 
-      // Если перед открытием карточка была прочитана, то класс уже должен быть,
-      // но на всякий случай добавили (markAsRead и add).
-      // Можно убрать data-атрибут
       delete card.dataset.wasRead;
 
-      // Возвращаемся к карточке
       setTimeout(() => {
         card.scrollIntoView({ behavior: "smooth", block: "nearest" });
       }, 50);
@@ -639,21 +615,17 @@
     });
   }
 
-  // const resetBtn = document.getElementById('reset-progress');
   const confirmDialog = document.getElementById("confirm-dialog");
   const confirmText = document.getElementById("confirm-text");
   const confirmYes = document.getElementById("confirm-yes");
   const confirmNo = document.getElementById("confirm-no");
 
-  // Функция для показа диалога
   function showConfirmDialog() {
-    console.log("showConfirmDialog called", confirmDialog);
     if (!confirmDialog) return;
-    confirmText.textContent = "Clear all read progress?"; // ← вот это
+    confirmText.textContent = "Clear all read progress?";
     confirmDialog.classList.add("is-visible");
   }
 
-  // Функция для скрытия диалога
   function hideConfirmDialog() {
     if (!confirmDialog) return;
     confirmDialog.classList.remove("is-visible");
@@ -668,24 +640,21 @@
     confirmYes.addEventListener("click", () => {
       localStorage.removeItem(STORAGE_KEY);
       hideConfirmDialog();
-      applyFiltersAndSort(); // мягко перерисовываем все карточки
+      applyFiltersAndSort();
     });
 
     confirmNo.addEventListener("click", () => {
       hideConfirmDialog();
     });
 
-    // Закрытие по клику на фон (сам диалог)
     confirmDialog.addEventListener("click", (e) => {
       if (e.target === confirmDialog) {
         hideConfirmDialog();
       }
     });
 
-    // Закрытие по клику в любом месте вне диалога
     document.addEventListener("click", (e) => {
       if (!confirmDialog.classList.contains("is-visible")) return;
-      // Если клик вне диалога и не по кнопке сброса
       if (!confirmDialog.contains(e.target) && e.target !== resetBtn) {
         hideConfirmDialog();
       }
@@ -800,12 +769,8 @@
     });
   }
 
-  // 7.5 Height adapter (Tilda zero-block)
-  // Артборду в макете задана фиксированная высота; контент растёт при
-  // загрузке CSV и при раскрытии карточек — синхронизируем высоту.
-  // Докрут при открытии ВЕРНУЛСЯ в умном режиме (см. секцию 6): «всегда-
-  // докрут» давал скачки (7 итераций), умный — скроллит только когда
-  // начало карточки вне зоны чтения. Тестируем на Тильде.
+  // 7.5 Height adapter (Tilda zero-block): синхронизирует высоту artboard
+  // с контентом (в t123 не используется — высота = контент автоматически).
   const dreamsApp = document.getElementById("dreams-app");
   const artboard = dreamsApp ? dreamsApp.closest(".t396__artboard") : null;
   if (dreamsApp && artboard && window.ResizeObserver) {

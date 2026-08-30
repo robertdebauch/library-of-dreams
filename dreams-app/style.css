@@ -11,7 +11,6 @@
   --shadow-color: #080808;
   --footer-color: #000000;
   --color-accent: #ccc1ea;
-  /* текст сна: тёплый светло-серый (не мёртвый #cacaca, не резкий #fff) */
   --color-dream-text: #e7e4e4;
 
   --font: "Manrope", sans-serif;
@@ -108,7 +107,7 @@ body {
   gap: var(--space-1);
 }
 
-/* --- Общие стили табов (фильтр и сортировка) --- */
+/* --- Общие стили табов --- */
 .dreams-filter__tab,
 .dreams-sort__tab {
   border: none;
@@ -134,7 +133,6 @@ body {
   color: var(--color-grey);
 }
 
-/* press-фидбек: кнопки должны «прожиматься» */
 .dreams-filter__tab:active,
 .dreams-sort__tab:active {
   transform: scale(0.97);
@@ -156,13 +154,10 @@ body {
 .dreams-count {
   margin-bottom: var(--space-4);
   font-size: var(--fontSize-0);
-  color: var(--color-grey); /* #999: контраст на #121212 >= 4.5:1 (AA) */
+  color: var(--color-grey);
 }
 
-/* --- Сетка карточек ---
-   align-items: start — карточки НЕ растягиваются на высоту строки:
-   при раскрытии одного сна соседи в закрытом виде не вытягиваются
-   (осознанное решение Роберта, вернули 26.08). */
+/* --- Сетка карточек --- */
 .dreams-grid {
   display: grid;
   align-items: start;
@@ -178,8 +173,6 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  /* верхнее меню Тильды (fixed, ~40px) наслаивается на карточку —
-     при скролле к началу сна заголовок остаётся читаемым */
   scroll-margin-top: 60px;
   transition: border 0.15s;
 }
@@ -220,8 +213,6 @@ body {
   font-size: var(--fontSize-1);
   line-height: 1.5;
   color: var(--color-lightgrey);
-  /* переносы строк из CSV (абзацы в description) — сохраняем,
-     как в .dream-card__fulltext (иначе HTML схлопывает \n в пробелы) */
   white-space: pre-wrap;
 }
 
@@ -252,8 +243,6 @@ body {
   color: var(--color-dream-text);
   line-height: 1.6;
 }
-/* Абзацы текста сна: JS превращает переносы строк в <p>,
-   здесь — вертикальный воздух между абзацами */
 .dream-card__fulltext p {
   margin: 0 0 1em;
 }
@@ -283,7 +272,6 @@ body {
     transform 160ms ease-out;
 }
 
-/* press-фидбек */
 .dream-card__link:active,
 .dream-card__audio-btn:active {
   transform: scale(0.97);
@@ -295,7 +283,7 @@ body {
   height: 1rem;
 }
 
-/* --- Нижний бар (плеер + эмбиент) --- */
+/* --- Нижний бар --- */
 .dreams-bottom-bar {
   position: fixed;
   font-size: var(--fontSize-1);
@@ -305,7 +293,6 @@ body {
   z-index: 998;
   display: flex;
   align-items: center;
-  /* justify-content: space-between; */
   justify-content: flex-end;
   gap: var(--space-2);
   padding: var(--space-2) var(--space-3);
@@ -360,7 +347,7 @@ body {
   flex-direction: column;
 }
 
-/* Общие стили для кнопок в баре (Ambient и Reset) */
+/* --- Кнопки бара (Ambient и Reset) --- */
 .ambient-btn,
 .reset-progress {
   position: static;
@@ -380,11 +367,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-1); /* иконка + подпись «Сбросить» */
+  gap: var(--space-1);
   flex-shrink: 0;
 }
 
-/* press-фидбек */
 .ambient-btn:active,
 .reset-progress:active {
   transform: scale(0.97);
@@ -402,7 +388,6 @@ body {
   height: 1.2rem;
 }
 
-/* Уникальное состояние для Ambient (активен) */
 .ambient-btn--on {
   background: var(--shadow-color);
   color: var(--color-lightest-grey);
@@ -411,7 +396,6 @@ body {
 
 .secret-reset {
   position: fixed;
-  /* или absolute, если бар фиксирован */
   bottom: 0;
   left: 0;
   width: 24px;
@@ -435,7 +419,6 @@ body {
   text-align: center;
   max-width: calc(100vw - 40px);
   width: 280px;
-  /* Плавное появление */
   opacity: 0;
   visibility: hidden;
   transition:
@@ -457,7 +440,7 @@ body {
   justify-content: center;
 }
 .confirm-btn {
-  padding: var(--space-2) var(--space-4); /* побольше для пальцев */
+  padding: var(--space-2) var(--space-4);
   border: 1px solid var(--stroke-dark);
   border-radius: calc(var(--radii-1) / 2);
   background: var(--dark-grey-color);
@@ -494,7 +477,6 @@ body {
   .dreams-player {
     flex: 1;
     margin-right: 0;
-    /* убираем desktop-отступ, если он был */
   }
 
   .player-info {
@@ -526,8 +508,6 @@ body {
   pointer-events: auto;
 }
 
-/* Аудио (аудиофон + плеер) пока не в проекте — скрыто; вернуть,
-   когда появится аудио-часть (см. DECISIONS.md, вводные п.7) */
 #ambient-toggle,
 #dreams-player {
   display: none !important;
@@ -540,9 +520,6 @@ body {
   }
 }
 
-/* Панель (Reset и т.д.) показывается только когда архив в зоне видимости:
-   класс вешается script.js (IntersectionObserver на #dreams-app) —
-   в hero/описании панель не видна. */
 .dreams-bottom-bar {
   opacity: 1;
   visibility: visible;
